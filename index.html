@@ -1,743 +1,1205 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CAT · UX Strategy Phase 1 · Aditi Consulting</title>
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<!-- saved from url=(0126)file:///C:/Users/SrinivasMeka/OneDrive%20-%20Aditi%20Consulting/Documents/Projects/CAT/CAT%20UX/CAT_UX_Phase1_Interactive.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CAT Operator Experience &amp; HMI UX Strategy — Phase 1 | Aditi Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="./CAT Operator Experience &amp; HMI UX Strategy — Phase 1 _ Aditi Consulting_files/css2" rel="stylesheet">
+<script src="./CAT Operator Experience &amp; HMI UX Strategy — Phase 1 _ Aditi Consulting_files/d3.min.js.download"></script>
 <style>
-	:root {
-	--dark:  #052239;
-	--dark2: #031829;
-	--navy:  #182D82;
-	--sky:   #00B9F1;
-	--teal:  #00C48C;
-	--gold:  #FFA300;
-	--lilac: #4172B8;
-	--gray:  #EDEDED;
-	}
-	*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-	html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Roboto', sans-serif; background: var(--dark2); }
+:root{
+  --dark:#052239;--dark2:#031928;--navy:#182D82;
+  --sky:#00B9F1;--teal:#00C48C;--gold:#FFA300;--lilac:#4172B8;
+  --gray:#EDEDED;--white:#fff;
+  --body-font:'Roboto',sans-serif;--head-font:'Lato',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--body-font);font-size:15px;line-height:1.6;color:#1a2a3a;background:#fff;overflow-x:hidden;padding-bottom:52px;}
+a{text-decoration:none;color:var(--sky);}
+img{max-width:100%;}
 
-	/* ── SLIDE CONTAINER ─────────────────────────────────────────── */
-	#deck { width: 100%; height: 100%; position: relative; }
-	.slide {
-	position: absolute; inset: 0;
-	display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
-	padding: 4vw 6vw;
-	opacity: 0; pointer-events: none;
-	transition: opacity .5s ease, transform .5s ease;
-	transform: translateX(40px);
-	overflow: hidden;
-	}
-	.slide.active {
-	opacity: 1; pointer-events: all;
-	transform: translateX(0);
-	}
-	.slide.exit-left {
-	opacity: 0; transform: translateX(-40px);
-	transition: opacity .35s ease, transform .35s ease;
-	pointer-events: none;
-	}
+/* GATE */
+#gate{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,var(--dark2) 0%,var(--navy) 100%);display:flex;align-items:center;justify-content:center;transition:opacity .6s,visibility .6s;}
+#gate.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+.gate-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:3rem 2.5rem;max-width:420px;width:90%;text-align:center;}
+.gate-logo{font-family:var(--head-font);font-weight:900;font-size:2rem;color:#fff;letter-spacing:-.03em;margin-bottom:.25rem;}
+.gate-logo span{color:var(--sky);}
+.gate-tag{font-family:var(--head-font);font-weight:700;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:1.75rem;}
+.gate-title{font-family:var(--head-font);font-weight:700;font-size:1.1rem;color:#fff;margin-bottom:.4rem;}
+.gate-desc{font-size:.85rem;color:rgba(255,255,255,.5);margin-bottom:1.75rem;line-height:1.6;}
+.gate-field-wrap{position:relative;margin-bottom:1rem;}
+.gate-field-wrap input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:3px;color:#fff;font-size:.95rem;padding:.8rem 2.5rem .8rem 1rem;outline:none;transition:border-color .2s;}
+.gate-field-wrap input:focus{border-color:var(--sky);}
+.gate-field-wrap input::placeholder{color:rgba(255,255,255,.3);}
+.gate-toggle{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:.85rem;}
+.gate-btn{width:100%;background:var(--navy);color:#fff;border:none;border-radius:3px;padding:.85rem;font-family:var(--head-font);font-weight:700;font-size:.9rem;letter-spacing:.06em;cursor:pointer;transition:background .2s;}
+.gate-btn:hover{background:var(--sky);}
+.gate-error{color:#ff6b6b;font-size:.8rem;margin-top:.5rem;height:1em;}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.gate-box.shake{animation:shake .4s;}
 
-	/* ── NAV BAR ─────────────────────────────────────────────────── */
-	#nav-bar {
-	position: fixed; bottom: 0; left: 0; right: 0; height: 52px; z-index: 100;
-	background: rgba(3,24,41,.95); backdrop-filter: blur(10px);
-	border-top: 1px solid rgba(255,255,255,.08);
-	display: flex; align-items: center; justify-content: space-between;
-	padding: 0 2rem;
-	}
-	#nav-bar .nav-logo { font-family: 'Lato', sans-serif; font-weight: 900; font-size: 1rem; color: #fff; }
-	#nav-bar .nav-logo span { color: var(--sky); }
-	.nav-controls { display: flex; align-items: center; gap: 1.2rem; }
-	.nav-btn {
-	background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
-	color: #fff; font-family: 'Lato', sans-serif; font-weight: 700; font-size: .75rem;
-	letter-spacing: .08em; padding: .4rem 1.1rem; border-radius: 3px;
-	cursor: pointer; transition: background .2s;
-	}
-	.nav-btn:hover { background: rgba(255,255,255,.16); }
-	.nav-btn:disabled { opacity: .3; cursor: default; }
-	#slide-counter { font-family: 'Lato', sans-serif; font-weight: 700; font-size: .75rem; color: rgba(255,255,255,.45); letter-spacing: .1em; min-width: 60px; text-align: center; }
-	.nav-dots { display: flex; gap: .4rem; align-items: center; }
-	.dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.2); cursor: pointer; transition: background .2s, transform .2s; }
-	.dot.active { background: var(--sky); transform: scale(1.35); }
-	#nav-bar .nav-conf { font-family: 'Lato', sans-serif; font-weight: 700; font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.25); }
+/* NAV */
+#main-nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:60px;background:rgba(3,25,40,.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;}
+.nav-logo{font-family:var(--head-font);font-weight:900;font-size:1.35rem;color:#fff;letter-spacing:-.03em;}
+.nav-logo span{color:var(--sky);}
+.nav-links{display:flex;align-items:center;gap:0;list-style:none;}
+.nav-links a{font-family:var(--head-font);font-weight:700;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.55);padding:.25rem .9rem;transition:color .2s;position:relative;}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:.9rem;right:.9rem;height:2px;background:var(--sky);transform:scaleX(0);transition:transform .25s;}
+.nav-links a.active{color:#fff;}
+.nav-links a.active::after{transform:scaleX(1);}
+.nav-badge{display:flex;align-items:center;gap:.4rem;background:rgba(0,185,241,.1);border:1px solid rgba(0,185,241,.25);border-radius:100px;padding:.25rem .85rem;font-family:var(--head-font);font-weight:700;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--sky);margin-left:.75rem;}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal);animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.nav-mobile-btn{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px;}
+.nav-mobile-btn span{width:22px;height:1.5px;background:#fff;transition:all .3s;}
+@media(max-width:900px){.nav-links{display:none;position:fixed;top:60px;left:0;right:0;bottom:0;background:var(--dark2);flex-direction:column;justify-content:center;gap:2rem;}.nav-links.open{display:flex;}.nav-links a{font-size:1.25rem;letter-spacing:.1em;}.nav-badge{display:none;}.nav-mobile-btn{display:flex;}}
 
-	/* ── PROGRESS BAR ────────────────────────────────────────────── */
-	#progress {
-	position: fixed; top: 0; left: 0; height: 3px; z-index: 200;
-	background: linear-gradient(90deg, var(--sky), var(--teal), var(--gold));
-	transition: width .4s ease;
-	}
+/* HERO */
+#hero{min-height:100vh;background:linear-gradient(135deg,var(--dark2) 0%,#0a1f3a 40%,var(--navy) 100%);position:relative;display:flex;align-items:center;padding-top:60px;overflow:hidden;}
+#hero-canvas{position:absolute;inset:0;z-index:0;}
+.hero-content{position:relative;z-index:2;max-width:1200px;margin:0 auto;padding:5rem 2.5rem;}
+.eyebrow{font-family:var(--head-font);font-weight:700;font-size:.68rem;letter-spacing:.25em;text-transform:uppercase;color:var(--sky);display:flex;align-items:center;gap:.7rem;margin-bottom:.8rem;}
+.eyebrow::before{content:'';width:24px;height:2px;background:var(--sky);flex-shrink:0;}
+.hero-h1{font-family:var(--head-font);font-weight:900;font-size:clamp(2.25rem,5vw,4rem);line-height:1.05;letter-spacing:-.03em;color:#fff;margin-bottom:1.25rem;max-width:820px;}
+.hero-h1 .sky{color:var(--sky);}
+.hero-sub{font-size:1.05rem;color:rgba(255,255,255,.65);max-width:680px;line-height:1.75;margin-bottom:2.75rem;}
+.hero-stats{display:flex;flex-wrap:wrap;gap:1rem;}
+.hstat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:1.1rem 1.5rem;min-width:130px;transition:border-color .25s;}
+.hstat:hover{border-color:rgba(0,185,241,.3);}
+.hstat .num{font-family:var(--head-font);font-weight:900;font-size:2rem;color:var(--sky);line-height:1;letter-spacing:-.04em;}
+.hstat .lbl{font-family:var(--head-font);font-weight:700;font-size:.63rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:.35rem;}
+.hero-tags{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:2rem;}
+/* COVER STATS (Slide-0 style) */
+.cover-stats{display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem;}
+.cstat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:.9rem 1.3rem;min-width:110px;}
+.cstat .num{font-family:var(--head-font);font-weight:900;font-size:1.7rem;color:var(--sky);line-height:1;letter-spacing:-.04em;}
+.cstat .lbl{font-family:var(--head-font);font-weight:700;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:.3rem;}
+.hero-tag{font-family:var(--head-font);font-weight:700;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .9rem;border-radius:3px;}
+.hero-tag-sky{background:rgba(0,185,241,.1);color:var(--sky);border:1px solid rgba(0,185,241,.25);}
+.hero-tag-teal{background:rgba(0,196,140,.1);color:var(--teal);border:1px solid rgba(0,196,140,.25);}
+.hero-tag-gold{background:rgba(255,163,0,.12);color:var(--gold);border:1px solid rgba(255,163,0,.25);}
 
-	/* ── SLIDE BACKGROUNDS ───────────────────────────────────────── */
-	.bg-dark { background: linear-gradient(135deg, var(--dark2) 0%, var(--dark) 60%, var(--navy) 100%); }
-	.bg-white { background: #fff; }
-	.bg-gray { background: var(--gray); }
-	.bg-navy { background: linear-gradient(135deg, var(--dark) 0%, var(--navy) 100%); }
+/* GRAD BAR */
+.grad-bar{height:3px;background:linear-gradient(90deg,#00B9F1,#00C48C,#FFA300);border:none;margin:0;}
 
-	/* ── PARTICLE CANVAS ─────────────────────────────────────────── */
-	#particles { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+/* SECTIONS */
+.s-dark{background:var(--dark);color:#fff;}
+.s-dark2{background:var(--dark2);color:#fff;}
+.s-white{background:#fff;color:#1a2a3a;}
+.s-gray{background:var(--gray);color:#1a2a3a;}
+section:not(#hero){padding:5.5rem 0;}
+.inner{max-width:1200px;margin:0 auto;padding:0 2.5rem;}
+.sec-hdr{margin-bottom:3.5rem;}
+.sec-num{font-family:var(--head-font);font-weight:900;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--sky);display:block;margin-bottom:.5rem;}
+.sec-h2{font-family:var(--head-font);font-weight:900;font-size:clamp(1.75rem,3.5vw,2.75rem);letter-spacing:-.03em;line-height:1.1;margin-bottom:.75rem;}
+.sec-h2.white{color:#fff;}
+.sec-desc{font-size:1rem;line-height:1.75;color:rgba(255,255,255,.6);max-width:660px;}
+.sec-desc.dark{color:rgba(26,42,58,.75);}
 
-	/* ── COMMON ELEMENTS ─────────────────────────────────────────── */
-	.slide-inner { position: relative; z-index: 1; width: 100%; max-width: 1100px; margin: 0 auto; padding-bottom: 52px; }
-	.eyebrow {
-	font-family: 'Lato', sans-serif; font-weight: 700; font-size: .68rem;
-	letter-spacing: .25em; text-transform: uppercase; color: var(--sky);
-	display: flex; align-items: center; gap: .7rem; margin-bottom: .8rem;
-	}
-	.eyebrow::before { content: ''; width: 24px; height: 2px; background: var(--sky); }
-	.slide-title {
-	font-family: 'Lato', sans-serif; font-weight: 900;
-	font-size: clamp(1.8rem, 3.5vw, 3rem);
-	line-height: 1.12; margin-bottom: .9rem;
-	}
-	.slide-sub { font-size: clamp(.85rem, 1.2vw, 1rem); line-height: 1.75; max-width: 640px; margin-bottom: 2rem; }
-	.dark-text { color: #fff; }
-	.dark-sub { color: rgba(255,255,255,.6); }
-	.light-text { color: var(--dark); }
-	.light-sub { color: #5a6a7a; }
-	.sky { color: var(--sky); }
-	.grad-bar { height: 3px; background: linear-gradient(90deg,#00B9F1,#00C48C,#FFA300); border: none; margin: 0; width: 100%; }
+/* STATS STRIP */
+#stats-strip{background:var(--dark2);padding:0;border-bottom:1px solid rgba(255,255,255,.06);}
+.stats-row{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr);padding:0 2.5rem;}
+@media(max-width:900px){.stats-row{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:540px){.stats-row{grid-template-columns:repeat(2,1fr);}}
+.sstat{text-align:center;padding:2.25rem 1rem;position:relative;}
+.sstat:not(:last-child)::after{content:'';position:absolute;right:0;top:20%;height:60%;width:1px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.08),transparent);}
+.sstat .snum{font-family:var(--head-font);font-weight:900;font-size:clamp(1.5rem,2.5vw,2.25rem);line-height:1;letter-spacing:-.04em;color:var(--sky);}
+.sstat .slbl{font-family:var(--head-font);font-weight:700;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.38);margin-top:.4rem;}
 
-	/* ── SLIDE 1: COVER ──────────────────────────────────────────── */
-	.cover-stats { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; }
-	.cstat {
-	background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
-	border-radius: 4px; padding: .9rem 1.3rem; min-width: 110px;
-	}
-	.cstat .num { font-family: 'Lato', sans-serif; font-weight: 900; font-size: 1.7rem; color: var(--sky); line-height: 1; }
-	.cstat .lbl { font-family: 'Lato', sans-serif; font-weight: 700; font-size: .58rem; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-top: .3rem; }
+/* DIFFERENTIATOR CARDS */
+.diff-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;}
+@media(max-width:700px){.diff-grid{grid-template-columns:1fr;}}
+.dark-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:3px;padding:2rem;transition:border-color .25s;position:relative;}
+.dark-card:hover{border-color:rgba(0,185,241,.3);}
+.dark-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0;}
+.dc-sky::before{background:var(--sky);}
+.dc-teal::before{background:var(--teal);}
+.dc-gold::before{background:var(--gold);}
+.dc-lilac::before{background:var(--lilac);}
+.card-icon{font-size:2rem;margin-bottom:1rem;display:block;}
+.card-h{font-family:var(--head-font);font-weight:900;font-size:1.1rem;color:#fff;margin-bottom:.6rem;}
+.card-p{font-size:.875rem;color:rgba(255,255,255,.62);line-height:1.7;}
 
-	/* ── CARD GRIDS ──────────────────────────────────────────────── */
-	.card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
-	.card-grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: .8rem; }
-	.card-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
-	.card-grid-3x2 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+/* TABS */
+.tab-bar{display:flex;gap:0;border-bottom:2px solid rgba(255,255,255,.08);margin-bottom:2.5rem;}
+.tab-bar.dark{border-bottom-color:rgba(255,255,255,.08);}
+.tab-bar.light{border-bottom-color:rgba(5,34,57,.12);}
+.tab-btn{font-family:var(--head-font);font-weight:700;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;padding:.85rem 1.75rem;background:none;border:none;cursor:pointer;position:relative;transition:color .2s;}
+.tab-bar.dark .tab-btn{color:rgba(255,255,255,.4);}
+.tab-bar.dark .tab-btn.active{color:#fff;}
+.tab-bar.light .tab-btn{color:rgba(5,34,57,.45);}
+.tab-bar.light .tab-btn.active{color:var(--dark);}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--sky);transform:scaleX(0);transition:transform .25s;}
+.tab-btn.active::after{transform:scaleX(1);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
 
-	.diff-card {
-	position: relative; background: #fff; border: 1px solid #e4eaf4; border-radius: 3px;
-	padding: 1.5rem 1.2rem; overflow: hidden;
-	animation: slideUp .5s ease both;
-	}
-	.diff-card:nth-child(1) { animation-delay: .1s; }
-	.diff-card:nth-child(2) { animation-delay: .2s; }
-	.diff-card:nth-child(3) { animation-delay: .3s; }
-	.diff-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
-	.diff-card:nth-child(1)::before { background: var(--sky); }
-	.diff-card:nth-child(2)::before { background: var(--teal); }
-	.diff-card:nth-child(3)::before { background: var(--gold); }
-	.diff-card .icon { font-size: 1.6rem; margin-bottom: .7rem; }
-	.diff-card h3 { font-family: 'Lato', sans-serif; font-weight: 700; font-size: .95rem; color: var(--dark); margin-bottom: .5rem; }
-	.diff-card p { font-size: .82rem; line-height: 1.65; color: #5a6a7a; }
+/* SCOPE */
+.scope-cols{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;}
+@media(max-width:800px){.scope-cols{grid-template-columns:1fr;}}
+.scope-head{font-family:var(--head-font);font-weight:900;font-size:1.25rem;color:var(--dark);margin-bottom:1.25rem;}
+.scope-item{display:flex;gap:.75rem;margin-bottom:.9rem;align-items:flex-start;}
+.sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:7px;}
+.sdot-sky{background:var(--sky);}
+.sdot-teal{background:var(--teal);}
+.scope-item-text{font-size:.875rem;color:rgba(26,42,58,.8);line-height:1.6;}
+.scope-item-text strong{color:var(--dark);display:block;font-weight:700;margin-bottom:.1rem;}
+.gate-callout{background:#e8f8f2;border-left:3px solid var(--teal);border-radius:0 4px 4px 0;padding:1.25rem 1.5rem;margin:1.5rem 0;}
+.gate-callout .gc-lbl{font-family:var(--head-font);font-weight:700;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:.4rem;}
+.gate-callout p{font-size:.875rem;color:rgba(5,34,57,.75);line-height:1.6;}
+.oos-list{list-style:none;padding:0;margin-top:2rem;}
+.oos-list li{padding:.6rem 0;border-bottom:1px solid rgba(5,34,57,.07);font-size:.875rem;color:rgba(26,42,58,.7);display:flex;gap:.75rem;}
+.oos-list li::before{content:'—';color:rgba(5,34,57,.25);flex-shrink:0;}
+.oos-list li:last-child{border-bottom:none;}
 
-	@keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+/* DELIVERABLES */
+.d-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;}
+@media(max-width:700px){.d-grid{grid-template-columns:1fr;}}
+.d-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:3px;padding:1.5rem;position:relative;overflow:hidden;transition:border-color .25s,transform .25s;}
+.d-card:hover{border-color:rgba(0,185,241,.3);transform:translateY(-3px);}
+.d-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--sky),var(--teal));transform:scaleX(0);transform-origin:left;transition:transform .4s;}
+.d-card:hover::before{transform:scaleX(1);}
+.d-teal-card::before{background:linear-gradient(90deg,var(--teal),var(--gold));}
+.d-id{font-family:var(--head-font);font-weight:900;font-size:1.75rem;color:var(--sky);line-height:1;margin-bottom:.35rem;letter-spacing:-.04em;}
+.d-teal-card .d-id{color:var(--teal);}
+.d-name{font-family:var(--head-font);font-weight:700;font-size:.95rem;color:#fff;margin-bottom:.65rem;}
+.d-desc{font-size:.85rem;color:rgba(255,255,255,.58);line-height:1.65;}
+.d-milestone{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--head-font);font-weight:700;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);background:rgba(255,163,0,.08);border:1px solid rgba(255,163,0,.2);border-radius:3px;padding:.2rem .6rem;margin-top:.85rem;}
+.discovery-gate-dark{background:rgba(0,196,140,.07);border:1px solid rgba(0,196,140,.2);border-radius:4px;padding:1.25rem 1.5rem;margin:1.5rem 0;}
+.dgd-lbl{font-family:var(--head-font);font-weight:700;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:.35rem;}
+.dgd-text{font-size:.875rem;color:rgba(255,255,255,.62);line-height:1.6;}
 
-	/* ── DELIVERABLES TABLE ──────────────────────────────────────── */
-	.del-table-wrap { overflow-x: auto; border-radius: 4px; border: 1px solid rgba(255,255,255,.08); width: 100%; }
-	.del-table { width: 100%; border-collapse: collapse; }
-	.del-table th { font-family: 'Lato', sans-serif; font-weight: 700; font-size: .6rem; letter-spacing: .15em; text-transform: uppercase; color: rgba(255,255,255,.45); text-align: left; padding: .5rem .8rem; background: rgba(255,255,255,.04); border-bottom: 1px solid rgba(255,255,255,.08); }
-	.del-table td { padding: .45rem .8rem; font-size: .78rem; color: rgba(255,255,255,.7); border-bottom: 1px solid rgba(255,255,255,.04); vertical-align: middle; }
-	.del-table tr:hover td { background: rgba(255,255,255,.03); }
-	.del-num { font-family: 'Lato', sans-serif; font-weight: 900; font-size: .72rem; color: var(--sky); background: rgba(0,185,241,.12); border-radius: 3px; padding: .15rem .45rem; display: inline-block; }
-	.del-ms { font-family: 'Lato', sans-serif; font-weight: 700; font-size: .68rem; color: var(--teal); }
+/* TEAM */
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+@media(max-width:900px){.team-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:560px){.team-grid{grid-template-columns:1fr;}}
+.person-card{background:#fff;border:1px solid #e4eaf4;border-radius:3px;padding:1.75rem;transition:all .3s;position:relative;overflow:hidden;}
+.person-card:hover{box-shadow:0 10px 36px rgba(5,34,57,.12);transform:translateY(-3px);}
+.person-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.pc-sky::before{background:var(--sky);}
+.pc-teal::before{background:var(--teal);}
+.pc-gold::before{background:var(--gold);}
+.pc-lilac::before{background:var(--lilac);}
+.pc-navy::before{background:var(--navy);}
+.person-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--head-font);font-weight:900;font-size:.9rem;color:#fff;margin-bottom:1rem;}
+.av-sky{background:var(--sky);}
+.av-teal{background:var(--teal);}
+.av-gold{background:var(--gold);}
+.av-lilac{background:var(--lilac);}
+.av-navy{background:var(--navy);}
+.person-role{font-family:var(--head-font);font-weight:700;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--sky);margin-bottom:.25rem;}
+.person-title{font-family:var(--head-font);font-weight:900;font-size:1rem;color:var(--dark);margin-bottom:.35rem;}
+.person-location{font-size:.78rem;color:var(--gold);font-weight:700;margin-bottom:.9rem;}
+.person-desc{font-size:.84rem;color:rgba(26,42,58,.72);line-height:1.65;}
+.person-highlights{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1rem;}
+.person-highlight{font-family:var(--head-font);font-weight:700;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .6rem;border-radius:3px;background:rgba(0,185,241,.08);color:var(--sky);border:1px solid rgba(0,185,241,.2);}
+.cat-req-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-top:2.5rem;}
+@media(max-width:700px){.cat-req-grid{grid-template-columns:1fr;}}
+.cat-req{border:1px solid #dce8f4;border-radius:3px;padding:1.25rem;background:#f7fbff;}
+.cat-req-title{font-family:var(--head-font);font-weight:700;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;}
+.cat-req p{font-size:.85rem;color:rgba(26,42,58,.7);line-height:1.55;}
 
-	/* ── SCOPE OBJECTIVES ────────────────────────────────────────── */
-	.obj-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: .8rem; margin-bottom: 1.5rem; }
-	.obj-card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 3px; padding: .9rem .8rem; animation: slideUp .5s ease both; }
-	.obj-card:nth-child(1){animation-delay:.05s} .obj-card:nth-child(2){animation-delay:.1s}
-	.obj-card:nth-child(3){animation-delay:.15s} .obj-card:nth-child(4){animation-delay:.2s}
-	.obj-card:nth-child(5){animation-delay:.25s}
-	.obj-num { font-family: 'Lato', sans-serif; font-weight: 900; font-size: 1.4rem; color: rgba(0,185,241,.3); line-height: 1; }
-	.obj-card h4 { font-family: 'Lato', sans-serif; font-weight: 700; font-size: .72rem; color: #fff; margin: .3rem 0; }
-	.obj-card p { font-size: .7rem; color: rgba(255,255,255,.45); line-height: 1.5; }
+/* SCHEDULE */
+.sched-wrap{max-width:900px;}
+.milestone-row{display:grid;grid-template-columns:72px 130px 1fr;gap:1.5rem;align-items:start;padding:1.5rem 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.milestone-row:last-child{border-bottom:none;}
+@media(max-width:700px){.milestone-row{grid-template-columns:52px 1fr;}}
+.m-badge{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--head-font);font-weight:900;font-size:1rem;flex-shrink:0;border:1px solid;}
+.m-badge-sky{background:rgba(0,185,241,.08);border-color:rgba(0,185,241,.25);color:var(--sky);}
+.m-badge-teal{background:rgba(0,196,140,.08);border-color:rgba(0,196,140,.25);color:var(--teal);}
+.m-wks{font-family:var(--head-font);font-weight:700;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:#c27d00;margin-bottom:.2rem;}
+.m-title{font-family:var(--head-font);font-weight:900;font-size:1rem;color:var(--dark);margin-bottom:.35rem;}
+.m-detail{font-size:.875rem;color:rgba(26,42,58,.72);line-height:1.55;}
+.m-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem;}
+.m-tag{font-family:var(--head-font);font-weight:700;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;padding:.18rem .55rem;border-radius:3px;}
+.mt-sky{background:rgba(0,185,241,.1);color:var(--sky);border:1px solid rgba(0,185,241,.2);}
+.mt-teal{background:rgba(0,196,140,.1);color:var(--teal);border:1px solid rgba(0,196,140,.2);}
+.mt-gate{background:rgba(255,163,0,.1);color:var(--gold);border:1px solid rgba(255,163,0,.2);}
+#gantt-wrap{margin-top:3.5rem;}
+#gantt-title{font-family:var(--head-font);font-weight:700;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(5,34,57,.4);margin-bottom:1.25rem;}
+#gantt-svg{width:100%;overflow:visible;}
 
-	/* ── TEAM CARDS ──────────────────────────────────────────────── */
-	.person-card {
-	background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
-	border-radius: 3px; padding: 1.2rem .9rem; text-align: center;
-	animation: slideUp .5s ease both;
-	}
-	.person-card:nth-child(1){animation-delay:.05s} .person-card:nth-child(2){animation-delay:.1s}
-	.person-card:nth-child(3){animation-delay:.15s} .person-card:nth-child(4){animation-delay:.2s}
-	.person-card:nth-child(5){animation-delay:.25s}
-	.person-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--navy), var(--sky)); display: flex; align-items: center; justify-content: center; font-family: 'Lato', sans-serif; font-weight: 900; font-size: .9rem; color: #fff; margin: 0 auto .8rem; }
-	.person-card h5 { font-family: 'Lato', sans-serif; font-weight: 700; font-size: .82rem; color: #fff; margin-bottom: .25rem; }
-	.person-role { font-size: .68rem; color: var(--sky); margin-bottom: .5rem; font-family: 'Lato', sans-serif; font-weight: 700; }
-	.person-card p { font-size: .7rem; color: rgba(255,255,255,.45); line-height: 1.55; margin-bottom: .7rem; }
-	.person-highlights { display: flex; flex-direction: column; gap: .25rem; }
-	.person-highlight { font-size: .62rem; font-family: 'Lato', sans-serif; font-weight: 700; color: rgba(255,255,255,.5); background: rgba(255,255,255,.05); border-radius: 2px; padding: .2rem .4rem; }
+/* CASE STUDY */
+.case-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;}
+@media(max-width:800px){.case-grid{grid-template-columns:1fr;}}
+.case-body p{font-size:.9rem;color:rgba(255,255,255,.68);line-height:1.75;margin-bottom:1rem;}
+.case-quote{background:rgba(0,185,241,.06);border-left:3px solid var(--sky);border-radius:0 4px 4px 0;padding:1.25rem 1.5rem;margin:1.5rem 0;}
+.case-quote p{font-size:.875rem;color:rgba(255,255,255,.7);line-height:1.7;margin:0;}
+.relevance-cards{display:flex;flex-direction:column;gap:.85rem;}
+.rel-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:3px;padding:1rem 1.25rem;}
+.rel-card .rl{font-family:var(--head-font);font-weight:700;font-size:.65rem;letter-spacing:.13em;text-transform:uppercase;color:var(--sky);margin-bottom:.3rem;}
+.rel-card p{font-size:.845rem;color:rgba(255,255,255,.6);line-height:1.55;}
+.outcomes-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-top:2rem;}
+@media(max-width:700px){.outcomes-grid{grid-template-columns:1fr;}}
+.outcome-item{background:rgba(0,196,140,.07);border:1px solid rgba(0,196,140,.15);border-radius:3px;padding:1rem 1.25rem;}
+.outcome-item .ol{font-family:var(--head-font);font-weight:700;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:.3rem;}
+.outcome-item p{font-size:.845rem;color:rgba(255,255,255,.68);line-height:1.5;}
 
-	/* ── PHASE CARDS ─────────────────────────────────────────────── */
-	.phase-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
-	.phase-card { border-radius: 4px; padding: 1.5rem 1.2rem; animation: slideUp .5s ease both; }
-	.phase-card:nth-child(1){animation-delay:.05s} .phase-card:nth-child(2){animation-delay:.15s} .phase-card:nth-child(3){animation-delay:.25s}
-	.phase-card.active-phase { background: linear-gradient(135deg, var(--dark), var(--navy)); border: 1px solid rgba(0,185,241,.2); }
-	.phase-card.future-phase { background: rgba(255,255,255,.04); border: 1px dashed rgba(255,255,255,.15); }
-	.phase-tag { font-family: 'Lato', sans-serif; font-weight: 700; font-size: .6rem; letter-spacing: .18em; text-transform: uppercase; display: block; margin-bottom: .4rem; }
-	.active-phase .phase-tag { color: var(--sky); }
-	.future-phase .phase-tag { color: rgba(255,255,255,.3); }
-	.phase-card h3 { font-family: 'Lato', sans-serif; font-weight: 900; font-size: 1.05rem; margin-bottom: .35rem; }
-	.active-phase h3 { color: #fff; }
-	.future-phase h3 { color: rgba(255,255,255,.55); }
-	.phase-inv { font-family: 'Lato', sans-serif; font-weight: 900; font-size: 1.5rem; margin-bottom: .7rem; }
-	.active-phase .phase-inv { color: var(--teal); }
-	.future-phase .phase-inv { color: rgba(255,255,255,.25); }
-	.phase-card p { font-size: .78rem; line-height: 1.65; }
-	.active-phase p { color: rgba(255,255,255,.55); }
-	.future-phase p { color: rgba(255,255,255,.35); }
-	.phase-list { list-style: none; margin-top: .8rem; }
-	.phase-list li { font-size: .74rem; padding: .2rem 0; display: flex; align-items: flex-start; gap: .4rem; }
-	.active-phase .phase-list li { color: rgba(255,255,255,.5); }
-	.future-phase .phase-list li { color: rgba(255,255,255,.25); }
-	.active-phase .phase-list li::before { content: '›'; color: var(--sky); font-weight: 700; }
-	.future-phase .phase-list li::before { content: '›'; color: rgba(255,255,255,.2); font-weight: 700; }
+/* PHASES */
+.phase-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3.5rem;}
+@media(max-width:750px){.phase-grid{grid-template-columns:1fr;}}
+.card{background:#fff;border:1px solid #e4eaf4;border-radius:3px;padding:1.75rem;transition:all .3s;position:relative;overflow:hidden;}
+.card:hover{box-shadow:0 10px 36px rgba(5,34,57,.12);transform:translateY(-3px);}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.card-sky::before{background:var(--sky);}
+.card-navy::before{background:var(--navy);}
+.card-lilac::before{background:var(--lilac);}
+.phase-label{font-family:var(--head-font);font-weight:700;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(5,34,57,.4);margin-bottom:.35rem;}
+.phase-title{font-family:var(--head-font);font-weight:900;font-size:1.1rem;color:var(--dark);margin-bottom:1.1rem;line-height:1.3;}
+.phase-meta{display:flex;flex-direction:column;gap:0;}
+.pmi{display:flex;justify-content:space-between;align-items:center;padding:.45rem 0;border-bottom:1px solid rgba(5,34,57,.06);font-size:.855rem;}
+.pmi:last-child{border-bottom:none;}
+.pmi .pk{color:rgba(5,34,57,.5);font-size:.82rem;}
+.pmi .pv{font-family:var(--head-font);font-weight:700;color:var(--sky);}
+.pmi .pv.inactive{color:rgba(5,34,57,.35);}
+.active-phase{background:linear-gradient(135deg,#e8f6fd,#f0fbf7);border-color:rgba(0,185,241,.3);}
+.context-table{width:100%;border-collapse:collapse;margin-top:2.5rem;}
+.context-table th{font-family:var(--head-font);font-weight:700;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(5,34,57,.5);padding:.85rem 1rem;text-align:left;border-bottom:2px solid rgba(5,34,57,.1);}
+.context-table td{padding:.9rem 1rem;border-bottom:1px solid rgba(5,34,57,.06);font-size:.875rem;color:rgba(26,42,58,.78);vertical-align:top;}
+.context-table td:first-child{font-family:var(--head-font);font-weight:700;color:rgba(5,34,57,.55);font-size:.8rem;width:200px;}
+.context-table tr:last-child td{border-bottom:none;}
+.context-table tr:nth-child(even) td{background:rgba(5,34,57,.02);}
 
-	/* ── CASE STUDY ──────────────────────────────────────────────── */
-	.cs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-	.cs-card { background: #fff; border: 1px solid #e4eaf4; border-radius: 3px; padding: 1.3rem 1.2rem; position: relative; overflow: hidden; animation: slideUp .5s ease both; }
-	.cs-card:nth-child(1){animation-delay:.05s} .cs-card:nth-child(2){animation-delay:.1s}
-	.cs-card:nth-child(3){animation-delay:.15s; grid-column:1/-1;}
-	.cs-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--sky), var(--teal)); }
-	.cs-label { font-family: 'Lato', sans-serif; font-weight: 700; font-size: .6rem; letter-spacing: .18em; text-transform: uppercase; color: var(--sky); display: block; margin-bottom: .4rem; }
-	.cs-card h4 { font-family: 'Lato', sans-serif; font-weight: 700; font-size: .88rem; color: var(--dark); margin-bottom: .5rem; }
-	.cs-card p { font-size: .8rem; line-height: 1.7; color: #4a5a6a; }
-	.cs-outcomes { display: flex; gap: 1.5rem; margin-top: .7rem; }
-	.cs-out { text-align: center; }
-	.cs-out-num { font-family: 'Lato', sans-serif; font-weight: 900; font-size: 1.4rem; color: var(--dark); }
-	.cs-out-lbl { font-family: 'Lato', sans-serif; font-weight: 700; font-size: .6rem; letter-spacing: .07em; text-transform: uppercase; color: #7a8a9a; margin-top: .2rem; }
+/* FOOTER */
+footer{background:var(--dark2);color:rgba(255,255,255,.55);padding:4rem 0 2rem;}
+.foot-inner{max-width:1200px;margin:0 auto;padding:0 2.5rem;}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:3rem;padding-bottom:2.5rem;border-bottom:1px solid rgba(255,255,255,.06);}
+@media(max-width:900px){.foot-grid{grid-template-columns:1fr 1fr;gap:2rem;}}
+@media(max-width:560px){.foot-grid{grid-template-columns:1fr;}}
+.foot-logo{font-family:var(--head-font);font-weight:900;font-size:1.75rem;color:#fff;letter-spacing:-.03em;margin-bottom:.5rem;}
+.foot-logo span{color:var(--sky);}
+.foot-desc{font-size:.85rem;line-height:1.65;color:rgba(255,255,255,.42);}
+.foot-heading{font-family:var(--head-font);font-weight:700;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:1rem;}
+.foot-link{display:block;font-size:.875rem;color:rgba(255,255,255,.45);margin-bottom:.5rem;transition:color .2s;}
+.foot-link:hover{color:var(--sky);}
+.foot-bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;padding-top:1.5rem;font-size:.78rem;color:rgba(255,255,255,.28);}
 
-	/* ── AGENDA SLIDE ────────────────────────────────────────────── */
-	.agenda-list { display: flex; flex-direction: column; gap: .6rem; max-width: 700px; }
-	.agenda-item { display: flex; align-items: center; gap: 1.2rem; padding: .8rem 1.2rem; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 3px; cursor: pointer; transition: border-color .2s; animation: slideUp .5s ease both; }
-	.agenda-item:hover { border-color: rgba(0,185,241,.3); }
-	.agenda-num { font-family: 'Lato', sans-serif; font-weight: 900; font-size: 1.1rem; color: var(--sky); min-width: 28px; }
-	.agenda-title { font-family: 'Lato', sans-serif; font-weight: 700; font-size: .88rem; color: #fff; }
-	.agenda-desc { font-size: .75rem; color: rgba(255,255,255,.45); }
 
-	/* ── SCHEDULE SLIDE ──────────────────────────────────────────── */
-	#gantt-slide { width: 100%; background: #fff; border-radius: 4px; padding: 1rem 1.2rem; }
+/* Dark section overrides for schedule rows */
+.s-dark .m-title,.s-dark2 .m-title{color:#fff;}
+.s-dark .m-detail,.s-dark2 .m-detail{color:rgba(255,255,255,.55);}
+.s-dark .m-wks,.s-dark2 .m-wks{color:var(--gold);}
 
-	/* ── PASSWORD GATE ───────────────────────────────────────────── */
-	#gate {
-	position: fixed; inset: 0; z-index: 9999;
-	background: linear-gradient(135deg, var(--dark2) 0%, var(--dark) 50%, var(--navy) 100%);
-	display: flex; align-items: center; justify-content: center;
-	transition: opacity .6s ease;
-	}
-	#gate.fade-out { opacity: 0; pointer-events: none; }
-	.gate-box { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); border-radius: 6px; padding: 3rem 3.5rem; width: 100%; max-width: 420px; text-align: center; }
-	.gate-logo { font-family: 'Lato', sans-serif; font-weight: 900; font-size: 1.8rem; color: #fff; margin-bottom: .3rem; }
-	.gate-logo span { color: var(--sky); }
-	.gate-tag { font-family: 'Lato', sans-serif; font-size: .65rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 2rem; display: block; }
-	.gate-title { font-family: 'Lato', sans-serif; font-weight: 700; font-size: 1.05rem; color: #fff; margin-bottom: .5rem; }
-	.gate-desc { font-size: .8rem; color: rgba(255,255,255,.45); margin-bottom: 2rem; line-height: 1.6; }
-	.gate-input-wrap { position: relative; margin-bottom: 1rem; }
-	.gate-input-wrap input { width: 100%; padding: .85rem 3rem .85rem 1rem; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.18); border-radius: 3px; color: #fff; font-family: 'Roboto', sans-serif; font-size: .95rem; outline: none; transition: border-color .25s; }
-	.gate-input-wrap input:focus { border-color: var(--sky); }
-	.gate-input-wrap input.error { border-color: #e74c3c; animation: shake .4s ease; }
-	.gate-toggle { position: absolute; right: .85rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: rgba(255,255,255,.4); font-size: .8rem; user-select: none; font-family: 'Lato', sans-serif; font-weight: 700; }
-	.gate-btn { width: 100%; padding: .9rem; background: var(--sky); border: none; border-radius: 3px; color: var(--dark); font-family: 'Lato', sans-serif; font-weight: 900; font-size: .95rem; cursor: pointer; transition: background .2s; }
-	.gate-btn:hover { background: #00a8db; }
 
+/* SECTION NAV BAR */
+#section-nav{position:fixed;bottom:0;left:0;right:0;z-index:998;height:52px;background:rgba(3,25,40,.97);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;transition:transform .3s;}
+#section-nav.hidden{transform:translateY(100%);}
+.snav-info{display:flex;align-items:center;gap:.85rem;}
+.snav-num{font-family:var(--head-font);font-weight:900;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--sky);}
+.snav-title{font-family:var(--head-font);font-weight:700;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6);}
+.snav-prog{display:flex;gap:4px;align-items:center;}
+.snav-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.2);transition:background .25s,transform .2s;}
+.snav-dot.active{background:var(--sky);transform:scale(1.3);}
+.snav-btns{display:flex;gap:.5rem;}
+.snav-btn{font-family:var(--head-font);font-weight:700;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.45rem 1.1rem;border:1px solid rgba(255,255,255,.15);border-radius:3px;background:transparent;color:rgba(255,255,255,.65);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.4rem;}
+.snav-btn:hover{border-color:var(--sky);color:#fff;background:rgba(0,185,241,.08);}
+.snav-btn:disabled{opacity:.25;cursor:default;pointer-events:none;}
+.snav-btn.primary{background:var(--sky);border-color:var(--sky);color:#fff;}
+.snav-btn.primary:hover{background:#00a3d9;}
+@media(max-width:680px){.snav-info{display:none;}.snav-prog{display:none;}}
+
+/* REVEAL ANIMATIONS */
+.reveal{opacity:0;transform:translateY(50px);transition:opacity .7s ease,transform .8s ease;}
+.reveal.visible{opacity:1;transform:none;}
+.reveal-left{opacity:0;transform:translateX(-50px);transition:opacity .7s ease,transform .8s ease;}
+.reveal-left.visible{opacity:1;transform:none;}
+.reveal-right{opacity:0;transform:translateX(50px);transition:opacity .7s ease,transform .8s ease;}
+.reveal-right.visible{opacity:1;transform:none;}
+.stagger>*{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .7s ease;}
+.stagger>.visible{opacity:1;transform:none;}
 </style>
 </head>
 <body>
 
-	<!-- ══ PASSWORD GATE ══════════════════════════════════════════════ -->
-	<div id="gate">
-		<div class="gate-box">
-			<div class="gate-logo">
-				Aditi Consulting<span>.</span>
-			</div>
-			<span class="gate-tag">Confidential · Client Proposal</span>
-			<div class="gate-title">CAT UX Strategy</div>
-			<div class="gate-desc">This document contains proprietary proposal content prepared for Caterpillar by Aditi Consulting. Authorized recipients only.</div>
-			<div class="gate-input-wrap">
-				<input type="password" id="gate-pw" placeholder="Enter access code" autocomplete="off">
-					<span class="gate-toggle" id="pw-toggle" onclick="togglePW()">SHOW</span>
-				</div>
-			<div class="gate-error" id="gate-err">&nbsp;</div>
-			<button class="gate-btn" onclick="checkGate()">Access Document →</button>
-		</div>
-	</div>
-
-<div id="progress"></div>
-
-<div id="deck">
-
-  <!-- ══ SLIDE 0: COVER ═══════════════════════════════════════ -->
-  <div class="slide bg-dark active" id="slide-0">
-    <canvas id="particles" style="position:absolute;inset:0;pointer-events:none;z-index:0;"></canvas>
-    <div class="slide-inner" style="position:relative;z-index:1;">
-      <div class="eyebrow" style="color:var(--sky);">Caterpillar · UX Strategy Engagement</div>
-      <h1 class="slide-title dark-text" style="font-size:clamp(2rem,4.5vw,3.6rem);">
-        Operator Experience.<br><span class="sky">Reimagined for the AI era.</span>
-      </h1>
-      <p class="slide-sub dark-sub">Phase 1 Discovery &amp; Strategy · Statement of Work · Aditi Consulting · 2026</p>
-      <hr class="grad-bar" style="max-width:400px;margin-bottom:1.8rem;">
-      <div class="cover-stats">
-        <div class="cstat"><div class="num">$600K</div><div class="lbl">Phase 1 Investment</div></div>
-        <div class="cstat"><div class="num">5</div><div class="lbl">Practitioners</div></div>
-        <div class="cstat"><div class="num">10</div><div class="lbl">Deliverables</div></div>
-        <div class="cstat"><div class="num">8</div><div class="lbl">Milestones</div></div>
-        <div class="cstat"><div class="num">6 Mo</div><div class="lbl">Engagement</div></div>
-      </div>
+<!-- PASSWORD GATE -->
+<div id="gate" class="hidden">
+  <div class="gate-box" id="gate-box">
+    <div class="gate-logo">Aditi<span>.</span></div>
+    <div class="gate-tag">Confidential Document Access</div>
+    <div class="gate-title">CAT Operator Experience &amp; HMI UX Strategy</div>
+    <div class="gate-desc">Phase 1: Discovery &amp; Strategy — Statement of Work<br>Prepared for Caterpillar Inc. by Aditi Consulting Inc.</div>
+    <div class="gate-field-wrap">
+      <input type="password" id="gate-input" placeholder="Enter access password" autocomplete="off">
+      <button class="gate-toggle" onclick="togglePW()" id="pw-toggle">Show</button>
     </div>
+    <div class="gate-error" id="gate-error"></div>
+    <button class="gate-btn" onclick="checkGate()">Access Document</button>
   </div>
-
-  <!-- ══ SLIDE 1: AGENDA ══════════════════════════════════════ -->
-  <div class="slide bg-dark" id="slide-1">
-    <div class="slide-inner">
-      <div class="eyebrow">Today's Agenda</div>
-      <h2 class="slide-title dark-text">What we're covering.</h2>
-      <div class="agenda-list">
-        <div class="agenda-item" onclick="goTo(2)" style="animation-delay:.05s">
-          <div class="agenda-num">01</div>
-          <div><div class="agenda-title">Why Aditi</div><div class="agenda-desc">Three reasons we're the right team for this challenge</div></div>
-        </div>
-        <div class="agenda-item" onclick="goTo(3)" style="animation-delay:.1s">
-          <div class="agenda-num">02</div>
-          <div><div class="agenda-title">Scope &amp; Deliverables</div><div class="agenda-desc">Five workstreams, ten deliverables, one outcome</div></div>
-        </div>
-        <div class="agenda-item" onclick="goTo(4)" style="animation-delay:.15s">
-          <div class="agenda-num">03</div>
-          <div><div class="agenda-title">The Team</div><div class="agenda-desc">Five expert practitioners — no bench warmers</div></div>
-        </div>
-        <div class="agenda-item" onclick="goTo(5)" style="animation-delay:.2s">
-          <div class="agenda-num">04</div>
-          <div><div class="agenda-title">Schedule</div><div class="agenda-desc">Eight milestones across six months</div></div>
-        </div>
-        <div class="agenda-item" onclick="goTo(6)" style="animation-delay:.25s">
-          <div class="agenda-num">05</div>
-          <div><div class="agenda-title">Investment &amp; Program Architecture</div><div class="agenda-desc">Phase 1 fixed, Phases 2 &amp; 3 scoped via D9</div></div>
-        </div>
-        <div class="agenda-item" onclick="goTo(7)" style="animation-delay:.3s">
-          <div class="agenda-num">06</div>
-          <div><div class="agenda-title">Proof of Work</div><div class="agenda-desc">Rail OEM case study — same challenge, proven execution</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ SLIDE 2: WHY ADITI ════════════════════════════════════ -->
-  <div class="slide bg-white" id="slide-2">
-    <div class="slide-inner">
-      <div class="eyebrow" style="color:var(--sky);">Why Aditi</div>
-      <h2 class="slide-title light-text">Three reasons we're the right team.</h2>
-      <p class="slide-sub light-sub">A rare combination of domain depth, AI fluency, and structured delivery methodology.</p>
-      <div class="card-grid-3">
-        <div class="diff-card">
-			<div class="icon">
-				<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00B9F1" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-					<rect x="2" y="7" width="20" height="14" rx="1"/>
-					<path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-					<line x1="12" y1="12" x2="12" y2="16"/>
-					<line x1="10" y1="14" x2="14" y2="14"/>
-				</svg>
-			</div>
-          <h3>Industrial UX Domain Expertise</h3>
-          <p>Our practitioners have designed for safety-critical environments including rail, heavy equipment, and industrial controls. We understand the operator context before the first interview.</p>
-        </div>
-        <div class="diff-card">
-			<div class="icon">
-				<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00C48C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-					<rect x="3" y="11" width="18" height="10" rx="2"/>
-					<circle cx="12" cy="5" r="2"/>
-					<line x1="12" y1="7" x2="12" y2="11"/>
-					<line x1="8" y1="15" x2="8" y2="15"/>
-					<line x1="16" y1="15" x2="16" y2="15"/>
-					<circle cx="8" cy="15" r="1" fill="#00C48C"/>
-					<circle cx="16" cy="15" r="1" fill="#00C48C"/>
-				</svg>
-			</div>
-          <h3>AI-Native Research &amp; Strategy</h3>
-          <p>AI opportunity analysis is embedded directly into UX research — identifying where machine intelligence reduces cognitive load and enables adaptive interfaces. Not bolted on; built in.</p>
-        </div>
-        <div class="diff-card">
-			<div class="icon">
-				<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFA300" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-					<polyline points="22 12 16 12 14 15 10 9 8 12 2 12"/>
-					<path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
-				</svg>
-			</div>
-          <h3>Structured Delivery with Business Value Linkage</h3>
-          <p>Every deliverable maps to a business outcome. D8 (Business Value Assessment) and D9 (Phase 2 Roadmap) ensure Phase 1 findings become an investable plan, not a shelf document.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ SLIDE 3: SCOPE ════════════════════════════════════════ -->
-  <div class="slide bg-navy" id="slide-3">
-    <div class="slide-inner">
-      <div class="eyebrow">Scope of Work</div>
-      <h2 class="slide-title dark-text">Ten deliverables. One clear outcome: a roadmap to build.</h2>
-      <div class="obj-grid">
-        <div class="obj-card"><div class="obj-num">01</div><h4>Kickoff &amp; Stakeholder Alignment</h4><p>Interview plan, discussion guide, summary report</p></div>
-        <div class="obj-card"><div class="obj-num">02</div><h4>Current State HMI Audit</h4><p>Experience audit; usability gaps and opportunity spaces</p></div>
-        <div class="obj-card"><div class="obj-num">03</div><h4>Field &amp; Operator Research</h4><p>Ethnographic field research; observations report</p></div>
-        <div class="obj-card"><div class="obj-num">04</div><h4>AI Opportunity Assessment</h4><p>Structured evaluation of AI integration value</p></div>
-        <div class="obj-card"><div class="obj-num">05</div><h4>UX Strategy &amp; P2 Readiness</h4><p>UX Strategy, BVA, Phase 2 Roadmap, Final Presentation</p></div>
-      </div>
-      <div class="del-table-wrap">
-        <table class="del-table">
-          <thead><tr><th style="width:52px;">No.</th><th>Deliverable</th><th style="width:210px;">Milestone</th></tr></thead>
-          <tbody>
-            <tr><td><span class="del-num">D1</span></td><td>Stakeholder Interview Plan &amp; Discussion Guide</td><td><span class="del-ms">M1 — Kickoff &amp; Planning</span></td></tr>
-            <tr><td><span class="del-num">D2</span></td><td>Stakeholder Interview Summary Report</td><td><span class="del-ms">M2 — Stakeholder Interviews</span></td></tr>
-            <tr><td><span class="del-num">D3</span></td><td>Current State Assessment: HMI Experience Audit</td><td><span class="del-ms">M3 — Current State Audit</span></td></tr>
-            <tr><td><span class="del-num">D4</span></td><td>User Research Coordination Framework</td><td><span class="del-ms">M4 — Field &amp; Operator Research</span></td></tr>
-            <tr><td><span class="del-num">D5</span></td><td>Field &amp; Operator Research Observations Report</td><td><span class="del-ms">M4 — Field &amp; Operator Research</span></td></tr>
-            <tr><td><span class="del-num">D6</span></td><td>AI Opportunity Assessment</td><td><span class="del-ms">M5 — AI Opportunity Assessment</span></td></tr>
-            <tr><td><span class="del-num">D7</span></td><td>Operator Experience UX Strategy Document</td><td><span class="del-ms">M6 — UX Strategy Development</span></td></tr>
-            <tr><td><span class="del-num">D8</span></td><td>Business Value Assessment</td><td><span class="del-ms">M7 — Business Value &amp; P2 Readiness</span></td></tr>
-            <tr><td><span class="del-num">D9</span></td><td>Phase 2 Readiness Roadmap &amp; Recommendations</td><td><span class="del-ms">M7 — Business Value &amp; P2 Readiness</span></td></tr>
-            <tr><td><span class="del-num">D10</span></td><td>Phase 1 Final Presentation</td><td><span class="del-ms">M8 — Final Presentation &amp; Closeout</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ SLIDE 4: TEAM ═════════════════════════════════════════ -->
-  <div class="slide bg-dark" id="slide-4">
-    <div class="slide-inner">
-      <div class="eyebrow">The Team</div>
-      <h2 class="slide-title dark-text">Five practitioners.</h2>
-      <p class="slide-sub dark-sub">Every role designed for this specific challenge.</p>
-      <div class="card-grid-5">
-        <div class="person-card"><div class="person-avatar">UX</div><h5>UX Strategy Lead</h5><div class="person-role">Engagement Lead</div><p>Drives strategy, stakeholder alignment, and connects every deliverable to CAT's objectives.</p><div class="person-highlights"><div class="person-highlight">HMI Strategy</div><div class="person-highlight">Stakeholder Leadership</div><div class="person-highlight">Industrial UX</div></div></div>
-        <div class="person-card"><div class="person-avatar">AI</div><h5>Principal AI Architect</h5><div class="person-role">AI Integration Lead</div><p>Leads D6 — identifying where AI creates measurable operator value and defining integration architecture.</p><div class="person-highlights"><div class="person-highlight">AI/ML Systems</div><div class="person-highlight">Edge Computing</div><div class="person-highlight">HMI AI Integration</div></div></div>
-        <div class="person-card"><div class="person-avatar">SR</div><h5>Senior UX Researcher</h5><div class="person-role">Research Lead</div><p>Designs and executes field research — ethnographic studies with operators in-situ.</p><div class="person-highlights"><div class="person-highlight">Ethnographic Research</div><div class="person-highlight">Contextual Inquiry</div><div class="person-highlight">Operator Studies</div></div></div>
-        <div class="person-card"><div class="person-avatar">UD</div><h5>UX Designer</h5><div class="person-role">Experience Design</div><p>Translates research into visual frameworks, concept models, and the UX Strategy document.</p><div class="person-highlights"><div class="person-highlight">Systems Design</div><div class="person-highlight">Concept Modeling</div><div class="person-highlight">HMI Prototyping</div></div></div>
-        <div class="person-card"><div class="person-avatar">PM</div><h5>Project Manager</h5><div class="person-role">Delivery Lead</div><p>Manages timelines, CAT coordination, milestone tracking, and risk escalation.</p><div class="person-highlights"><div class="person-highlight">Program Delivery</div><div class="person-highlight">Risk Management</div><div class="person-highlight">Stakeholder Sync</div></div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ SLIDE 5: SCHEDULE ═════════════════════════════════════ -->
-  <div class="slide bg-white" id="slide-5">
-    <div class="slide-inner">
-      <div class="eyebrow" style="color:var(--sky);">Engagement Schedule</div>
-      <h2 class="slide-title light-text">Eight milestones across six months.</h2>
-      <div style="display:flex;gap:.8rem;margin-bottom:1rem;flex-wrap:wrap;">
-        <span style="font-family:'Lato',sans-serif;font-weight:700;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .9rem;border-radius:20px;background:var(--sky);color:var(--dark);">Phase 1 — Active</span>
-        <span style="font-family:'Lato',sans-serif;font-weight:700;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .9rem;border-radius:20px;background:#e8eef4;color:#8a9aaa;border:1px solid #d0dce8;">Phase 2 — Pending D9</span>
-      </div>
-      <div id="gantt-slide"></div>
-      <p style="font-size:.75rem;color:#8a9aaa;font-style:italic;margin-top:.8rem;">Week ranges illustrative. Exact start date confirmed at contract execution. Milestones are fixed gates.</p>
-    </div>
-  </div>
-
-  <!-- ══ SLIDE 6: INVESTMENT ═══════════════════════════════════ -->
-  <div class="slide bg-dark" id="slide-6">
-    <div class="slide-inner">
-      <div class="eyebrow">Investment &amp; Program Architecture</div>
-      <h2 class="slide-title dark-text">Phase 1 is fixed. Phases 2 &amp; 3 are scoped by the work we do in it.</h2>
-      <p class="slide-sub dark-sub">D9 — the Phase 2 Readiness Roadmap — is the mechanism that scopes and prices Phase 2. No commitment before that work is complete.</p>
-      <div class="phase-cards">
-        <div class="phase-card active-phase">
-          <span class="phase-tag">Phase 1 · This SOW</span>
-          <h3>Discovery &amp; Strategy</h3>
-          <div class="phase-inv">$600K</div>
-          <p>6-month fixed engagement. 10 deliverables across 8 milestones.</p>
-          <ul class="phase-list">
-            <li>Stakeholder interviews &amp; HMI audit</li>
-            <li>Field &amp; operator research (D4, D5)</li>
-            <li>AI Opportunity Assessment (D6)</li>
-            <li>UX Strategy document (D7)</li>
-            <li>Business Value Assessment (D8)</li>
-            <li>Phase 2 Readiness Roadmap (D9)</li>
-          </ul>
-        </div>
-        <div class="phase-card future-phase">
-          <span class="phase-tag">Phase 2 · To Be Scoped via D9</span>
-          <h3>Design &amp; Prototype</h3>
-          <div class="phase-inv">TBD</div>
-          <p>Scope and investment defined by D9. Cannot be priced before research is complete.</p>
-          <ul class="phase-list">
-            <li>Concept design based on D7</li>
-            <li>Prototype development</li>
-            <li>Operator usability testing</li>
-            <li>Design system alignment</li>
-          </ul>
-        </div>
-        <div class="phase-card future-phase">
-          <span class="phase-tag">Phase 3 · Future</span>
-          <h3>Build &amp; Integrate</h3>
-          <div class="phase-inv">TBD</div>
-          <p>Full HMI build, AI integration, and operator experience rollout following Phase 2 validation.</p>
-          <ul class="phase-list">
-            <li>Full HMI development</li>
-            <li>AI feature integration</li>
-            <li>Field deployment &amp; training</li>
-            <li>Ongoing support model</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ SLIDE 7: CASE STUDY ═══════════════════════════════════ -->
-  <div class="slide bg-gray" id="slide-7">
-    <div class="slide-inner">
-      <div class="eyebrow" style="color:var(--sky);">Proof of Work</div>
-      <h2 class="slide-title light-text">We've done this before — in an similar context.</h2>
-      <div class="cs-grid">
-        <div class="cs-card">
-          <span class="cs-label">Engagement</span>
-          <h4>Leading Rail Technology OEM — Operator Interface Modernization</h4>
-          <p>Aditi led a full UX discovery and strategy engagement for a leading rail OEM modernizing locomotive cab interfaces — spanning multiple product lines with complex regulatory, safety, and operator certification requirements closely mirroring the CAT HMI context.</p>
-        </div>
-        <div class="cs-card">
-          <span class="cs-label">Scope &amp; Approach</span>
-          <h4>Field Research · AI Assessment · Design System Integration</h4>
-          <p>Ethnographic field research with certified locomotive engineers across multiple rail yards. AI readiness assessed against 14 operator task categories. All design outputs validated against the client's existing component library and compliance framework.</p>
-        </div>
-        <div class="cs-card">
-          <span class="cs-label">Outcomes &amp; Relevance to CAT</span>
-          <h4>Measurable results — and why they translate directly</h4>
-          <div class="cs-outcomes">
-            <div class="cs-out"><div class="cs-out-num">38%</div><div class="cs-out-lbl">Error Rate Reduction</div></div>
-            <div class="cs-out"><div class="cs-out-num">14</div><div class="cs-out-lbl">AI Opportunities ID'd</div></div>
-            <div class="cs-out"><div class="cs-out-num">$2.4M</div><div class="cs-out-lbl">Phase 2 Approved in 6 Wks</div></div>
-          </div>
-          <p style="margin-top:.8rem;">Both engagements share safety-critical HMI constraints, hardware-embedded interfaces, multi-stakeholder alignment, and AI integration challenges in high-consequence environments. The methodology developed here serves as the direct template for Phase 1 with CAT.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ SLIDE 8: CLOSE ════════════════════════════════════════ -->
-  <div class="slide bg-dark" id="slide-8">
-    <canvas id="particles2" style="position:absolute;inset:0;pointer-events:none;z-index:0;"></canvas>
-    <div class="slide-inner" style="position:relative;z-index:1;">
-      <div class="eyebrow">Ready to Build</div>
-      <h1 class="slide-title dark-text" style="font-size:clamp(2rem,4vw,3.2rem);">
-        Let's define the future of<br><span class="sky">operator experience at CAT.</span>
-      </h1>
-      <p class="slide-sub dark-sub" style="max-width:520px;">Phase 1 is scoped, staffed, and ready to launch. D9 will define what comes next — together.</p>
-      <hr class="grad-bar" style="max-width:360px;margin-bottom:2rem;">
-      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:center;">
-        <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:1rem 1.5rem;">
-          <div style="font-family:'Lato',sans-serif;font-weight:900;font-size:1.4rem;color:var(--sky);">$600K</div>
-          <div style="font-family:'Lato',sans-serif;font-weight:700;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:.25rem;">Phase 1 Investment</div>
-        </div>
-        <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:1rem 1.5rem;">
-          <div style="font-family:'Lato',sans-serif;font-weight:900;font-size:1.4rem;color:var(--teal);">6 Months</div>
-          <div style="font-family:'Lato',sans-serif;font-weight:700;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:.25rem;">To Phase 2 Roadmap</div>
-        </div>
-        <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:1rem 1.5rem;">
-          <div style="font-family:'Lato',sans-serif;font-weight:900;font-size:1.4rem;color:var(--gold);">D9</div>
-          <div style="font-family:'Lato',sans-serif;font-weight:700;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:.25rem;">Keys to Phase 2</div>
-        </div>
-      </div>
-      <div style="margin-top:2.5rem;font-family:'Lato',sans-serif;font-weight:700;font-size:.8rem;color:rgba(255,255,255,.35);letter-spacing:.1em;">
-        ADITI CONSULTING · 2026
-      </div>
-    </div>
-  </div>
-
-</div><!-- #deck -->
-
-<!-- ══ NAV BAR ══════════════════════════════════════════════════ -->
-<div id="nav-bar">
-  <div class="nav-logo">Aditi Consulting<span>.</span></div>
-  <div class="nav-controls">
-    <button class="nav-btn" id="btn-prev" onclick="prev()">← Prev</button>
-    <div class="nav-dots" id="dots"></div>
-    <span id="slide-counter">1 / 9</span>
-    <button class="nav-btn" id="btn-next" onclick="next()">Next →</button>
-  </div>
-  <div class="nav-conf">Phase 1 · 2026 · Confidential</div>
 </div>
 
+<!-- NAV -->
+<nav id="main-nav">
+  <a class="nav-logo" href="file:///C:/Users/SrinivasMeka/OneDrive%20-%20Aditi%20Consulting/Documents/Projects/CAT/CAT%20UX/CAT_UX_Phase1_Interactive.html#hero">Aditi<span>.</span></a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="file:///C:/Users/SrinivasMeka/OneDrive%20-%20Aditi%20Consulting/Documents/Projects/CAT/CAT%20UX/CAT_UX_Phase1_Interactive.html#hero" data-section="hero" class="active">Overview</a></li>
+    <li><a href="file:///C:/Users/SrinivasMeka/OneDrive%20-%20Aditi%20Consulting/Documents/Projects/CAT/CAT%20UX/CAT_UX_Phase1_Interactive.html#exec" data-section="exec" class="">01&nbsp;·&nbsp;Why Aditi</a></li>
+    <li><a href="file:///C:/Users/SrinivasMeka/OneDrive%20-%20Aditi%20Consulting/Documents/Projects/CAT/CAT%20UX/CAT_UX_Phase1_Interactive.html#scope" data-section="scope" class="">02&nbsp;·&nbsp;Approach</a></li>
+    <li><a href="file:///C:/Users/SrinivasMeka/OneDrive%20-%20Aditi%20Consulting/Documents/Projects/CAT/CAT%20UX/CAT_UX_Phase1_Interactive.html#deliverables" data-section="deliverables" class="">03&nbsp;·&nbsp;Deliverables</a></li>
+    <li><a href="file:///C:/Users/SrinivasMeka/OneDrive%20-%20Aditi%20Consulting/Documents/Projects/CAT/CAT%20UX/CAT_UX_Phase1_Interactive.html#team" data-section="team" class="">04&nbsp;·&nbsp;Team</a></li>
+    <li><a href="file:///C:/Users/SrinivasMeka/OneDrive%20-%20Aditi%20Consulting/Documents/Projects/CAT/CAT%20UX/CAT_UX_Phase1_Interactive.html#schedule" data-section="schedule" class="">05&nbsp;·&nbsp;Schedule</a></li>
+    <li><a href="file:///C:/Users/SrinivasMeka/OneDrive%20-%20Aditi%20Consulting/Documents/Projects/CAT/CAT%20UX/CAT_UX_Phase1_Interactive.html#casestudy" data-section="casestudy" class="">06&nbsp;·&nbsp;Case Study</a></li>
+    <li><a href="file:///C:/Users/SrinivasMeka/OneDrive%20-%20Aditi%20Consulting/Documents/Projects/CAT/CAT%20UX/CAT_UX_Phase1_Interactive.html#phases" data-section="phases" class="">07&nbsp;·&nbsp;Phases</a></li>
+    <li><span class="nav-badge"><span class="nav-dot"></span>Phase 1 SOW</span></li>
+  </ul>
+  <button class="nav-mobile-btn" onclick="document.getElementById(&#39;nav-links&#39;).classList.toggle(&#39;open&#39;)">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="hero-canvas" style="position:absolute;inset:0;z-index:0;pointer-events:none;"></canvas>
+  <div class="hero-content">
+    <span class="sec-num" style="color:rgba(255,255,255,.4);margin-bottom:.75rem;">Overview</span>
+    <div class="eyebrow">Caterpillar &nbsp;·&nbsp; UX Strategy Engagement</div>
+    <h1 class="hero-h1">Operator Experience.<br><span class="sky">Reimagined for the AI era.</span></h1>
+    <p class="hero-sub">Phase 1 Discovery &amp; Strategy &nbsp;·&nbsp; Statement of Work &nbsp;·&nbsp; Aditi Consulting &nbsp;·&nbsp; 2026</p>
+    <hr class="grad-bar" style="max-width:400px;margin-bottom:1.8rem;">
+    <div class="cover-stats">
+      <div class="cstat"><div class="num">$600K</div><div class="lbl">Phase 1 Investment</div></div>
+      <div class="cstat"><div class="num">5</div><div class="lbl">Practitioners</div></div>
+      <div class="cstat"><div class="num">10</div><div class="lbl">Deliverables</div></div>
+      <div class="cstat"><div class="num">8</div><div class="lbl">Milestones</div></div>
+      <div class="cstat"><div class="num">6 Mo</div><div class="lbl">Engagement</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="grad-bar">
+
+<!-- SECTION 1: EXECUTIVE SUMMARY (dark) -->
+<section class="s-dark" id="exec">
+  <div class="inner">
+    <div class="sec-hdr reveal visible">
+      <span class="sec-num">Section 01 &nbsp;•&nbsp; Why Aditi</span>
+      <h2 class="sec-h2 white">The Largest Untapped Differentiator<br>in the CAT Portfolio</h2>
+      <p class="sec-desc">An operator who knows how to run a CAT machine should feel that distinctiveness the moment they touch the controls. Today that experience is inconsistent, siloed, and undocumented at the strategy level.</p>
+    </div>
+    <div class="diff-grid stagger">
+      <div class="dark-card dc-sky visible">
+        <span class="card-icon">⚙</span>
+        <div class="card-h">Physical HMI Fluency</div>
+        <p class="card-p">The UX Strategy Lead and Senior Researcher are evaluated on physical HMI background in industrial environments. Joystick ergonomics, in-cab spatial conventions, and control layout under vibration and noise are a different discipline from digital product strategy. Candidates without direct equipment operator design experience are not considered.</p>
+      </div>
+      <div class="dark-card dc-teal visible">
+        <span class="card-icon">📍</span>
+        <div class="card-h">Embedded Full-Time Presence</div>
+        <p class="card-p">The Senior Researcher is on-site in Peoria, IL full-time for the full engagement. Full-time embedded presence builds institutional trust with CAT's team that cannot be replicated through scheduled visits. Contextual inquiry with operators in working conditions cannot be conducted remotely or in compressed site visits.</p>
+      </div>
+      <div class="dark-card dc-gold visible">
+        <span class="card-icon">🤝</span>
+        <div class="card-h">Co-Led Research</div>
+        <p class="card-p">CAT component leads participate in developing the findings rather than only reviewing them at the end. Teams who co-created the evidence are stakeholders in the outcome. A single named senior practitioner from Aditi AI Labs serves as both Principal AI Architect and Senior Advisor to the engagement.</p>
+      </div>
+      <div class="dark-card dc-lilac visible">
+        <span class="card-icon">🔩</span>
+        <div class="card-h">Proven Industrial AI Stack — Live in Production</div>
+        <p class="card-p">Aditi's AI Labs team recently delivered a custom HMI design system and operator interface platform for a leading rail technology OEM, built for industrial equipment operators under degraded connectivity, with MCP server integration and Figma Maker automation live in production. The same team and delivery stack are committed to CAT Phase 1.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<hr class="grad-bar">
+
+<!-- SECTION 2: SCOPE (light) -->
+<section class="s-white" id="scope">
+  <div class="inner">
+    <div class="sec-hdr reveal visible">
+      <span class="sec-num">Section 02 &nbsp;•&nbsp; Approach</span>
+      <h2 class="sec-h2">Two Sequential Workstreams,<br>One Strategic Foundation</h2>
+      <p class="sec-desc dark">Discovery must be substantially complete before UX Strategy synthesis begins. The transition is marked by a formal Discovery Readout that CAT stakeholders review and approve.</p>
+    </div>
+    <div class="tab-bar light">
+      <button class="tab-btn active" data-tab="discovery" onclick="switchTab(this,&#39;scope-tabs&#39;)">■&nbsp; Discovery (D1–D5)</button>
+      <button class="tab-btn" data-tab="ux-strategy" onclick="switchTab(this,&#39;scope-tabs&#39;)">■&nbsp; UX Strategy (D6–D10)</button>
+      <button class="tab-btn" data-tab="out-of-scope" onclick="switchTab(this,&#39;scope-tabs&#39;)">Out of Scope</button>
+    </div>
+    <div id="scope-tabs">
+      <div class="tab-panel active" id="tab-discovery">
+        <div class="scope-cols reveal visible">
+          <div>
+            <div class="scope-head">What Discovery Includes</div>
+            <div class="scope-item"><span class="sdot sdot-sky"></span><div class="scope-item-text"><strong>Stakeholder Interviews</strong>Structured interviews with CAT leadership, product owners, engineering leads, and field SMEs. Custom Discussion Guide aligned to strategic priorities. Synthesized into a Stakeholder Interview Summary Report covering alignment gaps, success definitions, and strategic tensions.</div></div>
+            <div class="scope-item"><span class="sdot sdot-sky"></span><div class="scope-item-text"><strong>HMI Experience Audit</strong>Structured audit of existing operator interface assets — component libraries, design documentation, in-cab display patterns, and physical control configurations across selected product lines. Output: a gap inventory organized by severity.</div></div>
+            <div class="scope-item"><span class="sdot sdot-sky"></span><div class="scope-item-text"><strong>Field &amp; Operator Research</strong>On-site contextual inquiry conducted jointly with CAT's internal UX research team. Aditi's Senior Researcher is embedded full-time. Sessions document workflow breakdowns, cognitive load patterns, physical interaction habits, and unmet needs that do not surface in lab or interview settings.</div></div>
+          </div>
+          <div>
+            <div class="scope-head">What Discovery Produces</div>
+            <div class="scope-item"><span class="sdot sdot-teal"></span><div class="scope-item-text"><strong>Evidence-Based Current State Picture</strong>A clear picture of the current operator experience: gaps, friction points, moments that matter most, and constraints (offline operation, mixed fleet, regulatory environment) that any future design must accommodate.</div></div>
+            <div class="scope-item"><span class="sdot sdot-teal"></span><div class="scope-item-text"><strong>Validated Research Record</strong>Raw session notes, structured observation reports, and supporting materials — organized for direct input into UX Strategy synthesis.</div></div>
+            <div class="gate-callout">
+              <div class="gc-lbl">▶&nbsp; Discovery Gate — Required Before UX Strategy Begins</div>
+              <p>Aditi presents consolidated Discovery findings in a structured readout session. Both teams align on what the research shows, surface and resolve conflicting interpretations, and formally confirm the priority operator experience problems the UX Strategy must address. CAT's written approval is required before UX Strategy begins.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-panel" id="tab-ux-strategy">
+        <div class="scope-cols reveal">
+          <div>
+            <div class="scope-head">UX Strategy Document Contains</div>
+            <div class="scope-item"><span class="sdot sdot-teal"></span><div class="scope-item-text"><strong>Operator Archetypes (3–5)</strong>Research-grounded behavioral and cognitive profiles of the distinct operator types CAT equipment serves. Each archetype documents primary tasks, physical interaction patterns, environmental context, tolerance for error, and relationship to technology.</div></div>
+            <div class="scope-item"><span class="sdot sdot-teal"></span><div class="scope-item-text"><strong>Design Principles (5–7)</strong>Governing principles derived from research — each stated as a directive ("Reduce operator cognitive load at peak decision moments"), illustrated with a concrete example, and accompanied by a counter-example of what it explicitly rules out.</div></div>
+            <div class="scope-item"><span class="sdot sdot-teal"></span><div class="scope-item-text"><strong>HMI Experience Vision</strong>Written and conceptual articulation of the target operator experience. Not a prototype — a clear description grounded in operator archetypes and expressed through 2–3 representative operator scenarios (e.g., dozer operator transitioning from GPS-guided grading to manual finish pass).</div></div>
+            <div class="scope-item"><span class="sdot sdot-teal"></span><div class="scope-item-text"><strong>End-to-End Experience Map</strong>Maps seven stages — Discovery, Purchase, Deploy, Activate, Training, Operate, Maintenance — with HMI touchpoints. Strategic insight: most HMI work over-focuses on Operate, while perception of the machine is set in the first hours of use.</div></div>
+          </div>
+          <div>
+            <div class="scope-item"><span class="sdot sdot-sky"></span><div class="scope-item-text"><strong>AI Opportunity Map</strong>Structured assessment of where AI integration creates genuine operator value versus where it adds complexity without benefit. Evaluated against four criteria: operator context fit, connectivity constraints, safety classification, and Phase 2 implementation feasibility.</div></div>
+            <div class="scope-item"><span class="sdot sdot-sky"></span><div class="scope-item-text"><strong>Strategic Recommendations</strong>Prioritized Phase 2 investment recommendations organized by operator impact and implementation complexity. Directly feeds D9 (Phase 2 Readiness Roadmap) and D8 (Business Value Assessment).</div></div>
+            <div class="scope-item"><span class="sdot sdot-sky"></span><div class="scope-item-text"><strong>Use Cases &amp; Design Workstream</strong>Definition of the design sprint philosophy; establishment of repeatable cycle framework: discover, build, prototype, test. Includes sprint development progression: Assumption validation, MVP definition, Experience validation, Expansion and refinement.</div></div>
+            <div style="background:#f0fbf7;border:1px solid rgba(0,196,140,.2);border-radius:3px;padding:1.25rem;margin-top:1rem;">
+              <div style="font-family:var(--head-font);font-weight:700;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:.4rem;">What the UX Strategy Is NOT</div>
+              <p style="font-size:.875rem;color:rgba(26,42,58,.7);line-height:1.6;">The UX Strategy document does not contain wireframes, screen designs, component specifications, or interaction prototypes. Those are Phase 2 outputs. The strategy defines <em>what</em> to build and <em>why</em>; Phase 2 defines <em>how</em> to build it.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-panel" id="tab-out-of-scope">
+        <div class="reveal" style="max-width:700px;">
+          <p style="font-size:.95rem;color:rgba(26,42,58,.7);margin-bottom:1.5rem;line-height:1.75;">The following items are explicitly excluded from Phase 1 scope. Each is either handled by a separate CAT team, governed by a separate Statement of Work, or deferred to Phase 2 or Phase 3.</p>
+          <ul class="oos-list">
+            <li>Design or development of new HMI components or display interfaces</li>
+            <li>In-depth digital product UX strategy (handled by separate CAT Digital team)</li>
+            <li>Physical component fabrication or manufacturing specifications</li>
+            <li>Independent operator interviews conducted without CAT researcher accompaniment</li>
+            <li>Embedded display screen content design (handled separately by CAT's existing digital UX team)</li>
+            <li>Detailed Phase 2 or Phase 3 scoping (each governed by separate Statements of Work)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<hr class="grad-bar">
+
+<!-- SECTION 3: DELIVERABLES (dark) -->
+<section class="s-dark" id="deliverables">
+  <div class="inner">
+    <div class="sec-hdr reveal visible">
+      <span class="sec-num">Section 03 &nbsp;•&nbsp; Deliverables</span>
+      <h2 class="sec-h2 white">Ten Deliverables.<br>Two Workstreams. One Gate.</h2>
+      <p class="sec-desc">Discovery (D1–D5) builds the evidence base. UX Strategy (D6–D10) synthesizes it into a durable strategic framework. CAT's written approval of the Discovery Readout is required before UX Strategy begins.</p>
+    </div>
+    <div class="tab-bar dark">
+      <button class="tab-btn active" data-tab="d-discovery" onclick="switchTab(this,&#39;del-tabs&#39;)">Discovery &nbsp; D1–D5</button>
+      <button class="tab-btn" data-tab="d-strategy" onclick="switchTab(this,&#39;del-tabs&#39;)">UX Strategy &nbsp; D6–D10</button>
+    </div>
+    <div id="del-tabs">
+      <div class="tab-panel active" id="tab-d-discovery">
+        <div class="d-grid stagger">
+          <div class="d-card visible">
+            <div class="d-id">D1</div>
+            <div class="d-name">Stakeholder Interview Plan &amp; Discussion Guide</div>
+            <div class="d-desc">Structured plan and facilitation guide for M2 interviews. Identifies participants by role and business unit, defines interview sequencing, and contains the full question set with branching logic for different stakeholder profiles. CAT's UX Manager reviews and approves before interviews begin.</div>
+            <div class="d-milestone">M1 — Wks 1–2</div>
+          </div>
+          <div class="d-card visible">
+            <div class="d-id">D2</div>
+            <div class="d-name">Stakeholder Interview Summary Report</div>
+            <div class="d-desc">Synthesis document capturing findings across all stakeholder interviews, organized by theme to surface areas of alignment, active disagreement, and gaps between leadership expectations and business positioning. Each theme supported by direct quotes attributed to role type. Explicit section on conflicting success definitions.</div>
+            <div class="d-milestone">M2 — Wks 2–7</div>
+          </div>
+          <div class="d-card visible">
+            <div class="d-id">D3</div>
+            <div class="d-name">Current State Assessment: HMI Experience Audit</div>
+            <div class="d-desc">Structured audit of existing operator interface assets: physical controls, in-cab display content and behavior, indicator and warning systems, and any existing design documentation or component libraries. Output is a gap inventory organized by severity, with highest-risk experience failures prioritized for direct address in the UX Strategy.</div>
+            <div class="d-milestone">M3 — Wks 4–9</div>
+          </div>
+          <div class="d-card visible">
+            <div class="d-id">D4</div>
+            <div class="d-name">User Research Coordination Framework</div>
+            <div class="d-desc">Planning and coordination document produced before field research begins, defining the methodology, schedule, and roles for joint Aditi–CAT operator research sessions. Documents any constraints or access limitations identified during planning that may affect research scope.</div>
+            <div class="d-milestone">M4 — Wks 8–13</div>
+          </div>
+          <div class="d-card visible">
+            <div class="d-id">D5</div>
+            <div class="d-name">Field &amp; Operator Research Observations Report</div>
+            <div class="d-desc">Primary research output of the Discovery workstream. Organized around operator tasks and decision moments — capturing how operators actually behave in field conditions, not how procedures say they should. Raw session notes and supporting materials included as an appendix.</div>
+            <div class="d-milestone">M4 — Wks 8–13</div>
+          </div>
+          <div class="d-card visible" style="border-color:rgba(0,196,140,.2);background:rgba(0,196,140,.05);">
+            <div style="font-family:var(--head-font);font-weight:900;font-size:1.1rem;color:var(--teal);margin-bottom:.5rem;">▶&nbsp; Discovery Readout Gate</div>
+            <div class="d-desc">Before UX Strategy synthesis begins, Aditi presents consolidated Discovery findings in a structured readout session with CAT's UX Manager and designated stakeholders. Both teams align on findings, resolve conflicting interpretations, and formally confirm the priority operator experience problems the UX Strategy must address. <strong style="color:rgba(255,255,255,.8);">CAT's written approval is required before UX Strategy begins.</strong></div>
+            <div class="d-milestone" style="color:var(--teal);background:rgba(0,196,140,.1);border-color:rgba(0,196,140,.25);">M4 Gate</div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-panel" id="tab-d-strategy">
+        <div class="d-grid stagger">
+          <div class="d-card d-teal-card">
+            <div class="d-id">D6</div>
+            <div class="d-name">AI Opportunity Assessment</div>
+            <div class="d-desc">Structured evaluation of where AI integration creates genuine, measurable operator value — and where it introduces complexity without benefit. Opportunities evaluated against: operator context fit, offline feasibility (can this function offline?), safety classification (does AI involvement require regulatory review?), and Phase 2 implementation feasibility. Led by the Principal AI Architect from Aditi AI Labs.</div>
+            <div class="d-milestone" style="color:var(--teal);background:rgba(0,196,140,.1);border-color:rgba(0,196,140,.25);">M5 — Wks 11–15</div>
+          </div>
+          <div class="d-card d-teal-card">
+            <div class="d-id">D7</div>
+            <div class="d-name">Operator Experience UX Strategy Document</div>
+            <div class="d-desc">The primary strategic deliverable of Phase 1 and the direct input to Phase 2 scoping. Synthesizes all Discovery findings into a durable framework defining what the CAT operator experience should be, why, and how to build toward it. Contains: operator archetypes, design principles, HMI experience vision, end-to-end experience map, AI opportunity integration, and strategic recommendations. Subject to 2–3 iterative review cycles with CAT's UX Manager.</div>
+            <div class="d-milestone" style="color:var(--teal);background:rgba(0,196,140,.1);border-color:rgba(0,196,140,.25);">M6 — Wks 14–21</div>
+          </div>
+          <div class="d-card d-teal-card">
+            <div class="d-id">D8</div>
+            <div class="d-name">Business Value Assessment</div>
+            <div class="d-desc">Structured analysis quantifying the business value of investing in a unified CAT operator experience. Translates UX Strategy findings into Phase 2 investment decision terms: productivity impact, safety, fleet lifecycle, and competitive differentiation. Value estimates supported by proxy data from comparable industrial HMI programs with assumptions stated explicitly.</div>
+            <div class="d-milestone" style="color:var(--teal);background:rgba(0,196,140,.1);border-color:rgba(0,196,140,.25);">M7 — Wks 20–24</div>
+          </div>
+          <div class="d-card d-teal-card">
+            <div class="d-id">D9</div>
+            <div class="d-name">Phase 2 Readiness Roadmap &amp; Recommendations</div>
+            <div class="d-desc">The document that scopes Phase 2. Translates the UX Strategy, AI Opportunity Map, and Business Value Assessment into a concrete Phase 2 recommendation: proposed scope and deliverable structure, team composition, timeline framework, investment range, identified dependencies and risks, and recommended sequencing of work within Phase 2.</div>
+            <div class="d-milestone" style="color:var(--teal);background:rgba(0,196,140,.1);border-color:rgba(0,196,140,.25);">M7 — Wks 20–24</div>
+          </div>
+          <div class="d-card d-teal-card" style="grid-column:span 2;">
+            <div class="d-id">D10</div>
+            <div class="d-name">Phase 1 Final Presentation</div>
+            <div class="d-desc">Executive-level presentation synthesizing Phase 1 findings, the UX Strategy, business value case, and Phase 2 recommendation for delivery to CAT leadership. Designed for an audience that has not been involved in the day-to-day work of Phase 1 — telling the complete story from problem framing through strategic recommendation in a format suitable for executive review and Phase 2 go/no-go decision-making. Accompanied by a knowledge transfer package containing all Phase 1 deliverables in organized, accessible form.</div>
+            <div class="d-milestone" style="color:var(--teal);background:rgba(0,196,140,.1);border-color:rgba(0,196,140,.25);">M8 — Wks 25–26</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<hr class="grad-bar">
+
+<!-- SECTION 4: TEAM (white) -->
+<section class="s-white" id="team">
+  <div class="inner">
+    <div class="sec-hdr reveal visible">
+      <span class="sec-num">Section 04 &nbsp;•&nbsp; Team</span>
+      <h2 class="sec-h2">Purpose-Built for This Engagement.<br>Not a Standard Configuration.</h2>
+      <p class="sec-desc dark">Every role was staffed specifically for this engagement. The combination of physical HMI background, embedded field research capacity, AI systems expertise, and structured delivery management is not available off the shelf.</p>
+    </div>
+    <div class="team-grid stagger">
+      <div class="person-card pc-sky visible">
+        <div class="person-avatar av-sky">UX</div>
+        <div class="person-role">Aditi Team &nbsp;•&nbsp; Engagement Lead</div>
+        <div class="person-title">UX Strategy Lead</div>
+        <div class="person-location">🏠&nbsp; Remote — Periodic On-Site Peoria, IL</div>
+        <p class="person-desc">Accountable for the quality and coherence of everything Phase 1 produces. Owns the relationship with CAT's UX Manager and is the single point of escalation for scope, timeline, and deliverable decisions. Designs the stakeholder interview methodology (D1), leads interview sessions (D2), and authors D7 — the Operator Experience UX Strategy Document. Owns all 2–3 iterative review cycles. Evaluated on physical HMI background in industrial environments; candidates without direct equipment operator design experience are not considered.</p>
+        <div class="person-highlights">
+          <div class="person-highlight">Physical HMI</div>
+          <div class="person-highlight">Industrial UX</div>
+          <div class="person-highlight">Executive Comms</div>
+        </div>
+      </div>
+      <div class="person-card pc-lilac visible">
+        <div class="person-avatar av-lilac">AI</div>
+        <div class="person-role">Aditi AI Labs &nbsp;•&nbsp; AI Integration Lead</div>
+        <div class="person-title">Principal AI Architect</div>
+        <div class="person-location">🏠&nbsp; Remote — Periodic On-Site as Needed</div>
+        <p class="person-desc">Named practitioner from Aditi's AI Labs with direct experience designing AI systems for hardware-integrated, connectivity-constrained environments. Participates in M1 to ensure the research framework captures task classification data, connectivity patterns, and operator decision-moment mapping that D6 requires. Leads the full AI Opportunity Assessment in M5. Available in advisory capacity during M6 to ensure the strategic framing of AI opportunities in D7 is technically accurate and implementable.</p>
+        <div class="person-highlights">
+          <div class="person-highlight">Edge AI</div>
+          <div class="person-highlight">MCP Integration</div>
+          <div class="person-highlight">Offline Systems</div>
+        </div>
+      </div>
+      <div class="person-card pc-teal visible">
+        <div class="person-avatar av-teal">SR</div>
+        <div class="person-role">Aditi Team &nbsp;•&nbsp; Research Lead</div>
+        <div class="person-title">Senior UX Researcher</div>
+        <div class="person-location">🏠&nbsp; Full-Time On-Site — Peoria, IL</div>
+        <p class="person-desc">Operational core of the Discovery workstream and the only team member physically present in Peoria for the full engagement. Full-time on-site presence is a structural requirement — contextual inquiry with operators in working conditions cannot be conducted remotely. Co-facilitates every stakeholder interview, leads field and operator research sessions (D4, D5), and is the primary liaison with CAT's internal UX research team. Primary author of the operator archetypes section of D7. Evaluated on physical HMI and industrial product research background.</p>
+        <div class="person-highlights">
+          <div class="person-highlight">Contextual Inquiry</div>
+          <div class="person-highlight">Field Research</div>
+          <div class="person-highlight">Synthesis</div>
+        </div>
+      </div>
+      <div class="person-card pc-gold visible">
+        <div class="person-avatar av-gold">DA</div>
+        <div class="person-role">Aditi Team &nbsp;•&nbsp; HMI Audit Lead</div>
+        <div class="person-title">UX Designer / Analyst</div>
+        <div class="person-location">🏠&nbsp; Remote</div>
+        <p class="person-desc">Leads the structured audit of CAT's existing HMI assets (D3) using a defined evaluation framework applied consistently across all assets reviewed — cataloguing component libraries, design documentation, in-cab display patterns, and physical control configurations. In the UX Strategy workstream, contributes to the visual expression of operator archetypes, design principles, and HMI experience vision in D7. Supports Phase 2 scope recommendations in D9 by documenting design system components Phase 2 will need to create, extend, or standardize.</p>
+        <div class="person-highlights">
+          <div class="person-highlight">HMI Audit</div>
+          <div class="person-highlight">Visual Systems</div>
+          <div class="person-highlight">Design Analysis</div>
+        </div>
+      </div>
+      <div class="person-card pc-navy visible" style="grid-column:span 2;">
+        <div class="person-avatar av-navy">PM</div>
+        <div class="person-role">Aditi Team &nbsp;•&nbsp; Delivery Lead</div>
+        <div class="person-title">Project Manager</div>
+        <div class="person-location">🏠&nbsp; Remote — Central Time Core Hours</div>
+        <p class="person-desc">Responsible for the operational integrity of the engagement from kickoff through final closeout. Manages the master schedule, milestone tracking, budget reporting, and cross-team coordination across a distributed team operating across time zones in parallel workstreams. Primary contact for bi-weekly status reports to the CAT UX Manager. Escalates access or stakeholder availability issues, coordinates milestone gate approvals, and ensures deliverable review windows are met.</p>
+        <div class="person-highlights">
+          <div class="person-highlight">Schedule Management</div>
+          <div class="person-highlight">Budget Tracking</div>
+          <div class="person-highlight">Cross-Team Coordination</div>
+          <div class="person-highlight">Milestone Governance</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:3.5rem;" class="reveal visible">
+      <div style="font-family:var(--head-font);font-weight:700;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(5,34,57,.45);margin-bottom:1.5rem;">CAT Participation Requirements</div>
+      <div class="cat-req-grid">
+        <div class="cat-req">
+          <div class="cat-req-title">CAT UX Manager — Primary Decision-Maker</div>
+          <p>Approves deliverables at each milestone gate, participates in the Discovery Readout and UX Strategy review cycles, escalates access issues, and attends bi-weekly status syncs with Aditi's PM.</p>
+        </div>
+        <div class="cat-req">
+          <div class="cat-req-title">Stakeholder Access — M2</div>
+          <p>CAT identifies, briefs, and schedules 12–15 participants spanning leadership, product ownership, engineering, and field operations. Delays in scheduling have direct downstream impact on D3 and D4 scope.</p>
+        </div>
+        <div class="cat-req">
+          <div class="cat-req-title">Field Research Access — M4</div>
+          <p>On-site access to CAT facilities and operator participants in working conditions throughout M4. CAT handles operator scheduling, facility access, safety briefings, and ensures its internal UX researcher accompanies all field sessions.</p>
+        </div>
+        <div class="cat-req">
+          <div class="cat-req-title">Review SLA — 5 Business Days</div>
+          <p>Written approval or specific, actionable feedback within 5 business days at three formal gates: Discovery Readout (M4), UX Strategy review cycles (M6, 2–3 rounds), and Final Presentation (M8).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<hr class="grad-bar">
+
+<!-- SECTION 5: SCHEDULE (gray) -->
+<section class="s-gray" id="schedule">
+  <div class="inner">
+    <div class="sec-hdr reveal visible">
+      <span class="sec-num">Section 05 &nbsp;•&nbsp; Schedule</span>
+      <h2 class="sec-h2">26 Weeks. 8 Milestones.<br>Four Formal Gates.</h2>
+      <p class="sec-desc dark">Phase 1 runs for approximately 6 months from the Schedule Effective Date (3–5 weeks after SOW signature). Milestones overlap by design — Discovery tracks run in parallel before converging at the M4 gate.</p>
+    </div>
+    <div id="gantt-wrap" class="reveal visible">
+      <div id="gantt-title">Milestone Timeline — Weeks 1–26</div>
+      <svg id="gantt-svg" viewBox="0 0 1120 418" height="418"><line x1="210" x2="210" y1="20" y2="388" stroke="rgba(5,34,57,0.08)" stroke-width="1"></line><text x="210" y="402" text-anchor="middle" font-size="10" font-family="Lato,sans-serif" fill="rgba(5,34,57,0.45)">W1</text><line x1="281.2" x2="281.2" y1="20" y2="388" stroke="rgba(5,34,57,0.08)" stroke-width="1"></line><text x="281.2" y="402" text-anchor="middle" font-size="10" font-family="Lato,sans-serif" fill="rgba(5,34,57,0.45)">W3</text><line x1="352.4" x2="352.4" y1="20" y2="388" stroke="rgba(5,34,57,0.08)" stroke-width="1"></line><text x="352.4" y="402" text-anchor="middle" font-size="10" font-family="Lato,sans-serif" fill="rgba(5,34,57,0.45)">W5</text><line x1="423.6" x2="423.6" y1="20" y2="388" stroke="rgba(5,34,57,0.08)" stroke-width="1"></line><text x="423.6" y="402" text-anchor="middle" font-size="10" font-family="Lato,sans-serif" fill="rgba(5,34,57,0.45)">W7</text><line x1="494.8" x2="494.8" y1="20" y2="388" stroke="rgba(5,34,57,0.08)" stroke-width="1"></line><text x="494.8" y="402" text-anchor="middle" font-size="10" font-family="Lato,sans-serif" fill="rgba(5,34,57,0.45)">W9</text><line x1="566" x2="566" y1="20" y2="388" stroke="rgba(5,34,57,0.08)" stroke-width="1"></line><text x="566" y="402" text-anchor="middle" font-size="10" font-family="Lato,sans-serif" fill="rgba(5,34,57,0.45)">W11</text><line x1="637.2" x2="637.2" y1="20" y2="388" stroke="rgba(5,34,57,0.08)" stroke-width="1"></line><text x="637.2" y="402" text-anchor="middle" font-size="10" font-family="Lato,sans-serif" fill="rgba(5,34,57,0.45)">W13</text><line x1="708.4000000000001" x2="708.4000000000001" y1="20" y2="388" stroke="rgba(5,34,57,0.08)" stroke-width="1"></line><text x="708.4000000000001" y="402" text-anchor="middle" font-size="10" font-family="Lato,sans-serif" fill="rgba(5,34,57,0.45)">W15</text><line x1="779.6" x2="779.6" y1="20" y2="388" stroke="rgba(5,34,57,0.08)" stroke-width="1"></line><text x="779.6" y="402" text-anchor="middle" font-size="10" font-family="Lato,sans-serif" fill="rgba(5,34,57,0.45)">W17</text><line x1="850.8" x2="850.8" y1="20" y2="388" stroke="rgba(5,34,57,0.08)" stroke-width="1"></line><text x="850.8" y="402" text-anchor="middle" font-size="10" font-family="Lato,sans-serif" fill="rgba(5,34,57,0.45)">W19</text><line x1="922" x2="922" y1="20" y2="388" stroke="rgba(5,34,57,0.08)" stroke-width="1"></line><text x="922" y="402" text-anchor="middle" font-size="10" font-family="Lato,sans-serif" fill="rgba(5,34,57,0.45)">W21</text><line x1="993.2" x2="993.2" y1="20" y2="388" stroke="rgba(5,34,57,0.08)" stroke-width="1"></line><text x="993.2" y="402" text-anchor="middle" font-size="10" font-family="Lato,sans-serif" fill="rgba(5,34,57,0.45)">W23</text><line x1="1064.4" x2="1064.4" y1="20" y2="388" stroke="rgba(5,34,57,0.08)" stroke-width="1"></line><text x="1064.4" y="402" text-anchor="middle" font-size="10" font-family="Lato,sans-serif" fill="rgba(5,34,57,0.45)">W25</text><rect x="210" y="20" width="890" height="38" fill="rgba(5,34,57,0.03)"></rect><text x="202" y="43" text-anchor="end" font-size="11" font-family="Lato,sans-serif" font-weight="700" fill="rgba(5,34,57,0.75)">M1 — Kickoff &amp; Planning</text><rect x="210" y="27.6" width="35.599999999999994" height="22.8" rx="3" fill="#00B9F122"></rect><rect x="210" y="27.6" width="35.599999999999994" height="22.8" rx="3" fill="#00B9F1" opacity="0.7" style="transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></rect><rect x="210" y="66" width="890" height="38" fill="transparent"></rect><text x="202" y="89" text-anchor="end" font-size="11" font-family="Lato,sans-serif" font-weight="700" fill="rgba(5,34,57,0.75)">M2 — Stakeholder Interviews</text><rect x="245.6" y="73.6" width="178.00000000000003" height="22.8" rx="3" fill="#00B9F122"></rect><rect x="245.6" y="73.6" width="178.00000000000003" height="22.8" rx="3" fill="#00B9F1" opacity="0.7" style="transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></rect><rect x="210" y="112" width="890" height="38" fill="rgba(5,34,57,0.03)"></rect><text x="202" y="135" text-anchor="end" font-size="11" font-family="Lato,sans-serif" font-weight="700" fill="rgba(5,34,57,0.75)">M3 — HMI Audit</text><rect x="316.8" y="119.6" width="178" height="22.8" rx="3" fill="#4172B822"></rect><rect x="316.8" y="119.6" width="178" height="22.8" rx="3" fill="#4172B8" opacity="0.7" style="transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></rect><rect x="210" y="158" width="890" height="38" fill="transparent"></rect><text x="202" y="181" text-anchor="end" font-size="11" font-family="Lato,sans-serif" font-weight="700" fill="#00C48C">M4 — Field Research ★</text><rect x="459.20000000000005" y="165.6" width="178" height="22.8" rx="3" fill="#00C48C22"></rect><rect x="459.20000000000005" y="165.6" width="178" height="22.8" rx="3" fill="#00C48C" opacity="1" style="transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></rect><text x="643.2" y="181" font-size="12" fill="#00C48C">★</text><rect x="210" y="204" width="890" height="38" fill="rgba(5,34,57,0.03)"></rect><text x="202" y="227" text-anchor="end" font-size="11" font-family="Lato,sans-serif" font-weight="700" fill="rgba(5,34,57,0.75)">M5 — AI Assessment</text><rect x="566" y="211.6" width="142.4000000000001" height="22.8" rx="3" fill="#00C48C22"></rect><rect x="566" y="211.6" width="142.4000000000001" height="22.8" rx="3" fill="#00C48C" opacity="0.7" style="transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></rect><rect x="210" y="250" width="890" height="38" fill="transparent"></rect><text x="202" y="273" text-anchor="end" font-size="11" font-family="Lato,sans-serif" font-weight="700" fill="#00C48C">M6 — UX Strategy</text><rect x="672.8" y="257.6" width="249.20000000000005" height="22.8" rx="3" fill="#00C48C22"></rect><rect x="672.8" y="257.6" width="249.20000000000005" height="22.8" rx="3" fill="#00C48C" opacity="1" style="transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></rect><text x="928" y="273" font-size="12" fill="#00C48C">★</text><rect x="210" y="296" width="890" height="38" fill="rgba(5,34,57,0.03)"></rect><text x="202" y="319" text-anchor="end" font-size="11" font-family="Lato,sans-serif" font-weight="700" fill="rgba(5,34,57,0.75)">M7 — Business Value</text><rect x="886.4" y="303.6" width="142.4000000000002" height="22.8" rx="3" fill="#FFA30022"></rect><rect x="886.4" y="303.6" width="142.4000000000002" height="22.8" rx="3" fill="#FFA300" opacity="0.7" style="transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></rect><rect x="210" y="342" width="890" height="38" fill="transparent"></rect><text x="202" y="365" text-anchor="end" font-size="11" font-family="Lato,sans-serif" font-weight="700" fill="#FFA300">M8 — Final Presentation ★</text><rect x="1064.4" y="349.6" width="35.59999999999991" height="22.8" rx="3" fill="#FFA30022"></rect><rect x="1064.4" y="349.6" width="35.59999999999991" height="22.8" rx="3" fill="#FFA300" opacity="1" style="transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></rect><text x="1106" y="365" font-size="12" fill="#FFA300">★</text></svg>
+    </div>
+    <div class="sched-wrap" style="margin-top:3rem;">
+      <div class="milestone-row reveal visible">
+        <div class="m-badge m-badge-sky">M1</div>
+        <div><div class="m-wks">Wks 1–2</div><div class="m-title">Project Kickoff &amp; Planning</div></div>
+        <div><p class="m-detail">Kickoff; finalize stakeholder list; align on research methodology; provision systems access. Aditi AI Labs joins M1 to ensure the research framework captures data needed for rigorous AI assessment.</p><div class="m-tags"><span class="m-tag mt-sky">D1 — Interview Plan</span></div></div>
+      </div>
+      <div class="milestone-row reveal visible">
+        <div class="m-badge m-badge-sky">M2</div>
+        <div><div class="m-wks">Wks 2–7</div><div class="m-title">Stakeholder Interviews</div></div>
+        <div><p class="m-detail">12–15 structured interviews with CAT leadership, product owners, engineering leads, and field SMEs. Co-facilitated by UX Strategy Lead and Senior Researcher. Findings synthesized by theme, not by respondent.</p><div class="m-tags"><span class="m-tag mt-sky">D2 — Interview Summary</span></div></div>
+      </div>
+      <div class="milestone-row reveal visible">
+        <div class="m-badge m-badge-sky">M3</div>
+        <div><div class="m-wks">Wks 4–9</div><div class="m-title">Current State HMI Audit</div></div>
+        <div><p class="m-detail">Structured audit of existing component libraries and design assets. UX Designer/Analyst applies a defined evaluation framework consistently across all assets reviewed. Output: gap inventory organized by severity.</p><div class="m-tags"><span class="m-tag mt-sky">D3 — HMI Audit</span></div></div>
+      </div>
+      <div class="milestone-row reveal visible">
+        <div class="m-badge m-badge-teal">M4</div>
+        <div><div class="m-wks" style="color:#007a57;">Wks 8–13</div><div class="m-title">Field &amp; Operator Research</div></div>
+        <div><p class="m-detail">On-site contextual inquiry and operator observation in Peoria, IL. Full-time embedded Senior Researcher co-leads sessions with CAT's internal UX researcher. All field sessions require CAT researcher accompaniment.</p><div class="m-tags"><span class="m-tag mt-sky">D4 — Research Framework</span><span class="m-tag mt-sky">D5 — Observations Report</span><span class="m-tag mt-gate">▶ Discovery Gate</span></div></div>
+      </div>
+      <div class="milestone-row reveal visible">
+        <div class="m-badge m-badge-teal">M5</div>
+        <div><div class="m-wks" style="color:#007a57;">Wks 11–15</div><div class="m-title">AI Opportunity Assessment</div></div>
+        <div><p class="m-detail">Principal AI Architect from Aditi AI Labs leads the full AI Opportunity Assessment. Identifies and ranks AI integration opportunities against operator context fit, offline feasibility, safety classification, and Phase 2 implementation requirements.</p><div class="m-tags"><span class="m-tag mt-teal">D6 — AI Opportunity Assessment</span></div></div>
+      </div>
+      <div class="milestone-row reveal visible">
+        <div class="m-badge m-badge-teal">M6</div>
+        <div><div class="m-wks" style="color:#007a57;">Wks 14–21</div><div class="m-title">UX Strategy Development</div></div>
+        <div><p class="m-detail">UX Strategy Lead synthesizes all Discovery findings into the Operator Experience UX Strategy Document. 2–3 iterative review cycles with CAT's UX Manager. Most extensive milestone in the engagement — longest period for a reason.</p><div class="m-tags"><span class="m-tag mt-teal">D7 — UX Strategy Document</span><span class="m-tag mt-gate">▶ UX Strategy Gate</span></div></div>
+      </div>
+      <div class="milestone-row reveal visible">
+        <div class="m-badge m-badge-teal">M7</div>
+        <div><div class="m-wks" style="color:#007a57;">Wks 20–24</div><div class="m-title">Business Value &amp; Phase 2 Readiness</div></div>
+        <div><p class="m-detail">Translates UX Strategy findings into the business case for Phase 2. Produces the Phase 2 Readiness Roadmap — the document that directly scopes and prices the next engagement. Both deliverables feed the Phase 2 go/no-go decision.</p><div class="m-tags"><span class="m-tag mt-teal">D8 — Business Value</span><span class="m-tag mt-teal">D9 — Phase 2 Roadmap</span></div></div>
+      </div>
+      <div class="milestone-row reveal visible">
+        <div class="m-badge m-badge-teal">M8</div>
+        <div><div class="m-wks" style="color:#007a57;">Wks 25–26</div><div class="m-title">Final Presentation &amp; Closeout</div></div>
+        <div><p class="m-detail">Executive-level presentation of Phase 1 findings to CAT leadership. Knowledge transfer package delivered with all Phase 1 deliverables organized and accessible for CAT's internal use, with a guide connecting each deliverable to Phase 2 work.</p><div class="m-tags"><span class="m-tag mt-teal">D10 — Final Presentation</span><span class="m-tag mt-gate">▶ Final Gate</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<hr class="grad-bar">
+
+<!-- SECTION 6: CASE STUDY (dark) -->
+<section class="s-dark2" id="casestudy">
+  <div class="inner">
+    <div class="sec-hdr reveal visible">
+      <span class="sec-num">Section 06 &nbsp;•&nbsp; Case Study</span>
+      <h2 class="sec-h2 white">Same HMI Challenges.<br>Live in Production.</h2>
+      <p class="sec-desc">Aditi AI Labs delivered this work. The same team and delivery stack are committed to CAT Phase 1.</p>
+    </div>
+    <div class="case-grid reveal visible">
+      <div class="case-body">
+        <div style="font-family:var(--head-font);font-weight:700;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--sky);margin-bottom:1rem;">The Engagement — Rail Technology OEM</div>
+        <p>Aditi designed and built a next-generation HMI platform for a leading rail technology OEM — delivering operator interfaces, control patterns, and a custom HMI design system for a fleet of autonomous rail inspection robots operating across active rail environments.</p>
+        <p>The platform supports real-time operator decision-making under degraded connectivity and across mixed equipment, requiring sub-second latency, offline-first field access, and a modular design system scalable across independently deployed inspection modules.</p>
+        <div class="case-quote">
+          <p>Custom HMI Design System built over the client's existing component library, extended with rail-specific operator controls, state patterns, and interaction conventions. Angular 20+ microfrontend platform with Native Federation. Progressive Web App architecture for full platform access from field devices without connectivity dependency.</p>
+        </div>
+        <div class="outcomes-grid">
+          <div class="outcome-item">
+            <div class="ol">Real-Time Fleet Ops</div>
+            <p>Multiple autonomous sleds simultaneously with sub-second latency across degraded rail environments.</p>
+          </div>
+          <div class="outcome-item">
+            <div class="ol">Offline-First Access</div>
+            <p>Full platform access from field devices without connectivity dependency — live in production.</p>
+          </div>
+          <div class="outcome-item">
+            <div class="ol">MCP + Figma Maker</div>
+            <p>MCP server integration and Figma Maker AI-assisted component generation — live in production.</p>
+          </div>
+          <div class="outcome-item">
+            <div class="ol">7 Inspection Modules</div>
+            <p>Independently deployed with isolated build pipelines; new types added without platform disruption.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--head-font);font-weight:700;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);margin-bottom:1rem;">Direct Relevance to CAT</div>
+        <div class="relevance-cards">
+          <div class="rel-card">
+            <div class="rl">Industrial Operator Context</div>
+            <p>Same core challenge: operators using equipment in field conditions, not digital product consumers. HMI built for the human operating the machine, not the engineer reviewing the spec.</p>
+          </div>
+          <div class="rel-card">
+            <div class="rl">Offline-First Interface Design</div>
+            <p>Full platform access without connectivity dependency. Directly applicable to CAT's underground mining, remote sites, and GPS-denied operation scenarios.</p>
+          </div>
+          <div class="rel-card">
+            <div class="rl">Custom HMI Design System</div>
+            <p>Built from the ground up for industrial equipment — not adapted from a digital product system. Same methodology Aditi will apply to CAT Phase 1 and Phase 2.</p>
+          </div>
+          <div class="rel-card">
+            <div class="rl">MCP Design Automation Live</div>
+            <p>MCP-based design system automation already in production, not a proof of concept. The same AI Labs team and delivery stack are committed to this engagement.</p>
+          </div>
+          <div class="rel-card">
+            <div class="rl">Scalable Modular Architecture</div>
+            <p>Design system that scales across independently deployed modules — directly relevant to CAT's mixed-fleet, multi-product-line challenge.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<hr class="grad-bar">
+
+<!-- SECTION 7: PHASES + CONTEXT (white) -->
+<section class="s-white" id="phases">
+  <div class="inner">
+    <div class="sec-hdr reveal visible">
+      <span class="sec-num">Section 07 &nbsp;•&nbsp; Future Phases</span>
+      <h2 class="sec-h2">Phase 1 Commits to Phase 1.<br>Phase 2 Scope Is Driven by Evidence.</h2>
+      <p class="sec-desc dark">This proposal commits only to Phase 1. D9 (Phase 2 Readiness Roadmap) is specifically designed to produce the inputs needed to scope and price Phase 2. The table below is directional only and carries no contractual weight.</p>
+    </div>
+    <div class="phase-grid stagger">
+      <div class="card card-sky active-phase visible">
+        <div class="phase-label">Phase 1 — This Document</div>
+        <div class="phase-title">Discovery &amp; Strategy</div>
+        <div class="phase-meta">
+          <div class="pmi"><span class="pk">Duration</span><span class="pv">~6 months</span></div>
+          <div class="pmi"><span class="pk">Investment</span><span class="pv">~$600K</span></div>
+          <div class="pmi"><span class="pk">Status</span><span class="pv">This SOW</span></div>
+          <div class="pmi"><span class="pk">Deliverables</span><span class="pv">D1–D10</span></div>
+        </div>
+        <p style="font-size:.82rem;color:rgba(26,42,58,.6);line-height:1.55;margin-top:1rem;">Stakeholder alignment, field research, HMI audit, AI opportunity assessment, UX strategy, business case, Phase 2 readiness roadmap.</p>
+      </div>
+      <div class="card card-navy visible">
+        <div class="phase-label">Phase 2 — Separate SOW</div>
+        <div class="phase-title">Physical Design System</div>
+        <div class="phase-meta">
+          <div class="pmi"><span class="pk">Duration</span><span class="pv inactive">4–6 months</span></div>
+          <div class="pmi"><span class="pk">Investment</span><span class="pv inactive">Scoped via D9</span></div>
+          <div class="pmi"><span class="pk">Status</span><span class="pv inactive">Follows Phase 1</span></div>
+          <div class="pmi"><span class="pk">Trigger</span><span class="pv inactive">D9 Delivery</span></div>
+        </div>
+        <p style="font-size:.82rem;color:rgba(26,42,58,.6);line-height:1.55;margin-top:1rem;">Design foundations, HMI component library, AI-enhanced specifications, validation with operators, design system in CAT format.</p>
+      </div>
+      <div class="card card-lilac visible">
+        <div class="phase-label">Phase 3 — Separate SOW</div>
+        <div class="phase-title">Maintenance &amp; Education</div>
+        <div class="phase-meta">
+          <div class="pmi"><span class="pk">Duration</span><span class="pv inactive">Ongoing</span></div>
+          <div class="pmi"><span class="pk">Investment</span><span class="pv inactive">Post-Phase 2</span></div>
+          <div class="pmi"><span class="pk">Status</span><span class="pv inactive">Follows Phase 2</span></div>
+          <div class="pmi"><span class="pk">Trigger</span><span class="pv inactive">Phase 2 Completion</span></div>
+        </div>
+        <p style="font-size:.82rem;color:rgba(26,42,58,.6);line-height:1.55;margin-top:1rem;">Design system maintenance, UX education program, institutional continuity, ongoing operator experience governance.</p>
+      </div>
+    </div>
+
+    <div class="reveal visible" style="margin-top:3.5rem;">
+      <div style="font-family:var(--head-font);font-weight:700;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(5,34,57,.45);margin-bottom:1.25rem;">Engagement Context</div>
+      <table class="context-table">
+        <tbody><tr><td>Engagement Type</td><td>UX Research, Discovery &amp; Strategy Consulting — Co-Managed with CAT's internal UX research team</td></tr>
+        <tr><td>Staffing Model</td><td>Senior UX Researcher: full-time on-site Peoria, IL. All other roles: remote or LATAM nearshore, Central Time core hours.</td></tr>
+        <tr><td>Physical HMI Scope</td><td>Joysticks, steering wheels, pedals, rocker switches, indication lamps, in-cab ergonomics, walk-around interactions. <em>Excludes embedded display screen content.</em></td></tr>
+        <tr><td>Key Constraints</td><td>Offline/disconnected operation (underground mining, remote sites); mixed fleet (CAT + competitor); HMI vs. digital boundary definition; AI edge deployment feasibility under connectivity gaps.</td></tr>
+        <tr><td>Tools</td><td>Figma (design audit) &nbsp;•&nbsp; Miro (synthesis &amp; workshops) &nbsp;•&nbsp; Microsoft Teams / SharePoint &nbsp;•&nbsp; Fathom (interview intelligence) &nbsp;•&nbsp; ProtoPie (prototype evaluation) &nbsp;•&nbsp; Adobe Suite</td></tr>
+        <tr><td>Deliverable Format</td><td>Microsoft Office-compatible formats (Word, PowerPoint, Excel). Figma files shared in view-access format. Miro boards shared as live links during active synthesis, exported as PDFs for the deliverable record.</td></tr>
+        <tr><td>Reporting Cadence</td><td>Bi-weekly status reports to CAT UX Manager; milestone gate reviews at M2, M4, M6, M8</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+</section>
+<hr class="grad-bar">
+
+<!-- FOOTER -->
+<footer>
+  <div style="background:var(--dark2);border-top:1px solid rgba(255,255,255,.08);padding:1.5rem 2.5rem;text-align:center;">
+    <span style="font-family:var(--head-font);font-weight:700;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.38);">ADITI CONSULTING &nbsp;·&nbsp; ADITICONSULTING.COM &nbsp;·&nbsp; CONFIDENTIAL &nbsp;·&nbsp; 2026</span>
+  </div>
+</footer>
+
 <script>
-	// ── PASSWORD GATE ────────────────────────────────────────────────
-	const PASS = 'CATUX2026';
-	function checkGate() {
-	const v = document.getElementById('gate-pw').value;
-	const inp = document.getElementById('gate-pw');
-	if (v === PASS) {
-	sessionStorage.setItem('cat_ux_access', '1');
-	const g = document.getElementById('gate');
-	g.classList.add('fade-out');
-	setTimeout(() => { g.style.display = 'none'; }, 700);
-	} else {
-	inp.classList.add('error');
-	document.getElementById('gate-err').textContent = 'Incorrect access code. Please try again.';
-	setTimeout(() => { inp.classList.remove('error'); inp.value = ''; }, 500);
-	}
-	}
-	function togglePW() {
-	const inp = document.getElementById('gate-pw');
-	const tog = document.getElementById('pw-toggle');
-	inp.type = inp.type === 'password' ? 'text' : 'password';
-	tog.textContent = inp.type === 'password' ? 'SHOW' : 'HIDE';
-	}
-	document.addEventListener('DOMContentLoaded', () => {
-	document.getElementById('gate-pw').addEventListener('keydown', e => { if (e.key === 'Enter') checkGate(); });
-	if (sessionStorage.getItem('cat_ux_access') === '1') document.getElementById('gate').style.display = 'none';
-	});
+// ============================================================
+// ALWAYS START AT TOP
+// ============================================================
+if('scrollRestoration' in history){ history.scrollRestoration = 'manual'; }
+window.addEventListener('load', function(){ window.scrollTo(0, 0); });
 
-	const TOTAL = 9;
-	let current = 0;
-
-	// Build dots
-	const dotsEl = document.getElementById('dots');
-	for (let i = 0; i < TOTAL; i++) {
-  const d = document.createElement('div');
-  d.className = 'dot' + (i === 0 ? ' active' : '');
-  d.onclick = () => goTo(i);
-  dotsEl.appendChild(d);
-}
-
-function updateUI() {
-  document.getElementById('slide-counter').textContent = `${current + 1} / ${TOTAL}`;
-  document.getElementById('btn-prev').disabled = current === 0;
-  document.getElementById('btn-next').disabled = current === TOTAL - 1;
-  document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
-  document.getElementById('progress').style.width = `${((current + 1) / TOTAL) * 100}%`;
-}
-
-function goTo(idx) {
-  if (idx === current) return;
-  const prev_slide = document.getElementById(`slide-${current}`);
-  const next_slide = document.getElementById(`slide-${idx}`);
-  prev_slide.classList.add('exit-left');
-  prev_slide.classList.remove('active');
-  setTimeout(() => prev_slide.classList.remove('exit-left'), 400);
-  next_slide.classList.add('active');
-  current = idx;
-  updateUI();
-  // Re-trigger animations on the new slide
-  next_slide.querySelectorAll('.diff-card,.obj-card,.person-card,.agenda-item,.phase-card,.cs-card').forEach(el => {
-    el.style.animation = 'none';
-    el.offsetHeight; // reflow
-    el.style.animation = '';
-  });
-  // Draw Gantt if schedule slide
-  if (current === 5) buildGantt();
-}
-
-function next() { if (current < TOTAL - 1) goTo(current + 1); }
-function prev() { if (current > 0) goTo(current - 1); }
-
-// Keyboard nav
-document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); next(); }
-  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prev(); }
-});
-
-// Particles (cover + close slide)
-function initParticleCanvas(id) {
-  const canvas = document.getElementById(id);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let W, H, particles = [];
-  function resize() {
-    W = canvas.width = canvas.offsetWidth;
-    H = canvas.height = canvas.offsetHeight;
+// ============================================================
+// PASSWORD GATE
+// ============================================================
+const PASS = 'CAT2025';
+function checkGate(){
+  const v = document.getElementById('gate-input').value;
+  const box = document.getElementById('gate-box');
+  const err = document.getElementById('gate-error');
+  if(v === PASS){
+    sessionStorage.setItem('cat-sow-unlocked','1');
+    document.getElementById('gate').classList.add('hidden');
+    err.textContent = '';
+  } else {
+    err.textContent = 'Incorrect password. Please try again.';
+    box.classList.remove('shake');
+    void box.offsetWidth;
+    box.classList.add('shake');
   }
+}
+document.getElementById('gate-input').addEventListener('keydown',e=>{ if(e.key==='Enter') checkGate(); });
+function togglePW(){
+  const i = document.getElementById('gate-input');
+  const t = document.getElementById('pw-toggle');
+  if(i.type==='password'){i.type='text';t.textContent='Hide';}else{i.type='password';t.textContent='Show';}
+}
+if(sessionStorage.getItem('cat-sow-unlocked')==='1'){
+  document.getElementById('gate').classList.add('hidden');
+}
+
+// ============================================================
+// PARTICLE CANVAS
+// ============================================================
+(function(){
+  const canvas = document.getElementById('hero-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  function resize(){ w = canvas.width = canvas.offsetWidth; h = canvas.height = canvas.offsetHeight; }
   resize();
   window.addEventListener('resize', resize);
-  for (let i = 0; i < 50; i++) {
-    particles.push({ x: Math.random()*W, y: Math.random()*H, vx:(Math.random()-.5)*.4, vy:(Math.random()-.5)*.4, r:Math.random()*1.6+.4, a:Math.random() });
+  function Particle(){
+    this.x = Math.random()*w; this.y = Math.random()*h;
+    this.vx = (Math.random()-.5)*.4; this.vy = (Math.random()-.5)*.4;
+    this.r = Math.random()*2+1; this.alpha = Math.random()*.5+.15;
   }
-  function draw() {
-    ctx.clearRect(0,0,W,H);
-    particles.forEach(p => {
-      p.x+=p.vx; p.y+=p.vy;
-      if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0;
-      p.a+=.004; if(p.a>1)p.a=.2;
+  for(let i=0;i<55;i++) particles.push(new Particle());
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    particles.forEach(p=>{
+      p.x += p.vx; p.y += p.vy;
+      if(p.x<0) p.x=w; if(p.x>w) p.x=0;
+      if(p.y<0) p.y=h; if(p.y>h) p.y=0;
       ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle=`rgba(0,185,241,${p.a*.6})`; ctx.fill();
+      ctx.fillStyle = `rgba(0,185,241,${p.alpha})`; ctx.fill();
     });
-    for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) {
-      const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
-      const d=Math.sqrt(dx*dx+dy*dy);
-      if(d<100) { ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle=`rgba(0,185,241,${(1-d/100)*.15})`; ctx.lineWidth=.6; ctx.stroke(); }
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<110){
+          ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.strokeStyle=`rgba(0,185,241,${(1-d/110)*.18})`; ctx.lineWidth=1; ctx.stroke();
+        }
+      }
     }
     requestAnimationFrame(draw);
   }
   draw();
-}
-initParticleCanvas('particles');
-initParticleCanvas('particles2');
+})();
 
-// D3 Gantt for slide 5
-function buildGantt() {
-  const el = document.getElementById('gantt-slide');
-  if (el.querySelector('svg')) return; // already drawn
+// ============================================================
+// COUNTER ANIMATION
+// ============================================================
+function animateCounter(el){
+  const target = parseInt(el.dataset.count);
+  const prefix = el.dataset.prefix||'';
+  const suffix = el.dataset.suffix||'';
+  const dur = 1600; const start = performance.now();
+  function step(now){
+    const t = Math.min((now-start)/dur,1);
+    const eased = 1-Math.pow(1-t,3);
+    el.textContent = prefix + Math.round(target*eased) + suffix;
+    if(t<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+const counterObs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ animateCounter(e.target); counterObs.unobserve(e.target); } });
+}, {threshold:0.5});
+document.querySelectorAll('[data-count]').forEach(el=>counterObs.observe(el));
+
+// ============================================================
+// SCROLL REVEAL
+// ============================================================
+const revealObs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      if(e.target.classList.contains('stagger')){
+        Array.from(e.target.children).forEach((c,i)=>{
+          setTimeout(()=>c.classList.add('visible'), i*120);
+        });
+      } else {
+        e.target.classList.add('visible');
+      }
+      revealObs.unobserve(e.target);
+    }
+  });
+},{threshold:0.12, rootMargin:'0px 0px -60px 0px'});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.stagger').forEach(el=>revealObs.observe(el));
+
+// ============================================================
+// ACTIVE NAV
+// ============================================================
+const sections = document.querySelectorAll('section[id],div[id="stats-strip"]');
+const navLinks = document.querySelectorAll('.nav-links a[data-section]');
+window.addEventListener('scroll',()=>{
+  let current='';
+  sections.forEach(s=>{
+    if(window.scrollY >= s.offsetTop - 120) current = s.id;
+  });
+  navLinks.forEach(a=>{ a.classList.toggle('active', a.dataset.section===current); });
+},{passive:true});
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(btn, containerId){
+  const tab = btn.dataset.tab;
+  const bar = btn.closest('.tab-bar');
+  bar.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const container = document.getElementById(containerId);
+  container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  const panel = document.getElementById('tab-'+tab);
+  if(panel){ panel.classList.add('active'); triggerRevealIn(panel); }
+}
+function triggerRevealIn(el){
+  el.querySelectorAll('.reveal,.reveal-left,.reveal-right,.stagger').forEach(r=>{
+    if(!r.classList.contains('visible')){
+      if(r.classList.contains('stagger')){
+        Array.from(r.children).forEach((c,i)=>setTimeout(()=>c.classList.add('visible'),i*100));
+      } else {
+        r.classList.add('visible');
+      }
+    }
+  });
+}
+
+// ============================================================
+// D3 GANTT CHART
+// ============================================================
+(function(){
   const milestones = [
-    {id:'M1',label:'Kickoff & Planning',           start:1, end:2,  color:'#00B9F1'},
-    {id:'M2',label:'Stakeholder Interviews',        start:3, end:7,  color:'#00C48C'},
-    {id:'M3',label:'Current State Audit',           start:4, end:6,  color:'#4172B8'},
-    {id:'M4',label:'Field & Operator Research',     start:7, end:11, color:'#FFA300'},
-    {id:'M5',label:'AI Opportunity Assessment',     start:10,end:13, color:'#00B9F1'},
-    {id:'M6',label:'UX Strategy Development',       start:14,end:18, color:'#00C48C'},
-    {id:'M7',label:'Business Value & P2 Readiness', start:18,end:21, color:'#FFA300'},
-    {id:'M8',label:'Final Presentation & Closeout', start:22,end:26, color:'#4172B8'},
+    {id:'M1', label:'M1 — Kickoff & Planning',    start:1,  end:2,  color:'#00B9F1', gate:false},
+    {id:'M2', label:'M2 — Stakeholder Interviews', start:2,  end:7,  color:'#00B9F1', gate:false},
+    {id:'M3', label:'M3 — HMI Audit',             start:4,  end:9,  color:'#4172B8', gate:false},
+    {id:'M4', label:'M4 — Field Research ★',      start:8,  end:13, color:'#00C48C', gate:true},
+    {id:'M5', label:'M5 — AI Assessment',          start:11, end:15, color:'#00C48C', gate:false},
+    {id:'M6', label:'M6 — UX Strategy',           start:14, end:21, color:'#00C48C', gate:true},
+    {id:'M7', label:'M7 — Business Value',        start:20, end:24, color:'#FFA300', gate:false},
+    {id:'M8', label:'M8 — Final Presentation ★',  start:25, end:26, color:'#FFA300', gate:true},
   ];
-  const TOTAL_W = 26;
-  const margin = {top:14,right:20,bottom:28,left:190};
-  const W = el.offsetWidth || 700;
-  const rowH = 30;
-  const cW = W - margin.left - margin.right;
-  const cH = milestones.length * rowH;
 
-  const svg = d3.select('#gantt-slide').append('svg')
-    .attr('width', W).attr('height', cH + margin.top + margin.bottom);
-  const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
+  function drawGantt(){
+    const container = document.getElementById('gantt-wrap');
+    if(!container) return;
+    const svg = document.getElementById('gantt-svg');
+    const cw = container.offsetWidth || 800;
+    const rowH = 38, rowGap = 8;
+    const margin = {top:20, right:20, bottom:30, left:210};
+    const chartW = cw - margin.left - margin.right;
+    const chartH = milestones.length * (rowH + rowGap) + margin.top + margin.bottom;
+    svg.setAttribute('viewBox', `0 0 ${cw} ${chartH}`);
+    svg.setAttribute('height', chartH);
+    svg.innerHTML = '';
 
-  const x = d3.scaleLinear().domain([1, TOTAL_W+1]).range([0, cW]);
-  const y = d3.scaleBand().domain(milestones.map(m=>m.id)).range([0,cH]).padding(.3);
+    const xScale = (v) => margin.left + (v - 1) / 25 * chartW;
 
-  // Grid lines + week labels
-  [1,5,9,13,17,21,24].forEach(wk => {
-    g.append('line').attr('x1',x(wk)).attr('x2',x(wk)).attr('y1',0).attr('y2',cH)
-      .attr('stroke','#dde6ef').attr('stroke-width',.7);
-    g.append('text').attr('x',x(wk)).attr('y',cH+18).attr('text-anchor','middle')
-      .attr('fill','#9aabb8').attr('font-size',9).attr('font-family','Lato').attr('font-weight','700').text(`Wk ${wk}`);
-  });
+    // Week grid lines
+    for(let w=1; w<=26; w+=2){
+      const x = xScale(w);
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',x); line.setAttribute('x2',x);
+      line.setAttribute('y1',margin.top); line.setAttribute('y2',chartH-margin.bottom);
+      line.setAttribute('stroke','rgba(5,34,57,0.08)'); line.setAttribute('stroke-width','1');
+      svg.appendChild(line);
+      const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+      lbl.setAttribute('x',x); lbl.setAttribute('y',chartH-margin.bottom+14);
+      lbl.setAttribute('text-anchor','middle'); lbl.setAttribute('font-size','10');
+      lbl.setAttribute('font-family','Lato,sans-serif'); lbl.setAttribute('fill','rgba(5,34,57,0.45)');
+      lbl.textContent = 'W'+w; svg.appendChild(lbl);
+    }
 
-  // Phase 1 gradient bracket
-  const defs = svg.append('defs');
-  const grad = defs.append('linearGradient').attr('id','ganttGrad').attr('x1','0%').attr('x2','100%');
-  grad.append('stop').attr('offset','0%').attr('stop-color','#00B9F1');
-  grad.append('stop').attr('offset','50%').attr('stop-color','#00C48C');
-  grad.append('stop').attr('offset','100%').attr('stop-color','#FFA300');
-  g.append('rect').attr('x',0).attr('y',-10).attr('width',cW).attr('height',4)
-    .attr('fill','url(#ganttGrad)').attr('rx',2);
+    milestones.forEach((m, i) => {
+      const y = margin.top + i * (rowH + rowGap);
+      const x1 = xScale(m.start);
+      const x2 = xScale(m.end);
+      const barW = Math.max(x2 - x1, 4);
 
-  // Row backgrounds
-  milestones.forEach(m => {
-    g.append('rect').attr('x',0).attr('y',y(m.id)).attr('width',cW).attr('height',y.bandwidth())
-      .attr('fill', milestones.indexOf(m)%2===0 ? '#f7f9fc' : '#fff');
-  });
+      // Background bar
+      const bgRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      bgRect.setAttribute('x', margin.left); bgRect.setAttribute('y', y);
+      bgRect.setAttribute('width', chartW); bgRect.setAttribute('height', rowH);
+      bgRect.setAttribute('fill', i%2===0 ? 'rgba(5,34,57,0.03)' : 'transparent');
+      svg.appendChild(bgRect);
 
-  // Bars (animated)
-  milestones.forEach(m => {
-    const bx = x(m.start);
-    const bw = Math.max(x(m.end+1)-x(m.start), 14);
-    g.append('rect').attr('x',bx).attr('y',y(m.id)+2).attr('width',0).attr('height',y.bandwidth()-4)
-      .attr('fill',m.color).attr('rx',3).attr('opacity',.85)
-      .transition().delay(200).duration(700).attr('width',bw);
-    // End dot
-    g.append('circle').attr('cx',bx+bw).attr('cy',y(m.id)+y.bandwidth()/2).attr('r',4)
-      .attr('fill',m.color).attr('stroke','#fff').attr('stroke-width',1.5);
-    // Left label
-    g.append('text').attr('x',-8).attr('y',y(m.id)+y.bandwidth()/2+4).attr('text-anchor','end')
-      .attr('fill','#2a3a4a').attr('font-size',10).attr('font-family','Lato').attr('font-weight','700')
-      .text(m.id + ' — ' + m.label);
-  });
-}
+      // Label
+      const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+      lbl.setAttribute('x', margin.left - 8); lbl.setAttribute('y', y + rowH/2 + 4);
+      lbl.setAttribute('text-anchor','end'); lbl.setAttribute('font-size','11');
+      lbl.setAttribute('font-family','Lato,sans-serif'); lbl.setAttribute('font-weight','700');
+      lbl.setAttribute('fill', m.gate ? m.color : 'rgba(5,34,57,0.75)');
+      lbl.textContent = m.label; svg.appendChild(lbl);
 
-updateUI();
+      // Bar background
+      const bgBar = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      bgBar.setAttribute('x', x1); bgBar.setAttribute('y', y + rowH*.2);
+      bgBar.setAttribute('width', barW); bgBar.setAttribute('height', rowH*.6);
+      bgBar.setAttribute('rx','3'); bgBar.setAttribute('fill', m.color+'22');
+      svg.appendChild(bgBar);
+
+      // Animated fill bar
+      const fillBar = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      fillBar.setAttribute('x', x1); fillBar.setAttribute('y', y + rowH*.2);
+      fillBar.setAttribute('width','0'); fillBar.setAttribute('height', rowH*.6);
+      fillBar.setAttribute('rx','3'); fillBar.setAttribute('fill', m.color);
+      fillBar.setAttribute('opacity', m.gate ? '1' : '0.7');
+      svg.appendChild(fillBar);
+      // Animate with timeout
+      setTimeout(()=>{
+        fillBar.style.transition = 'width 0.8s cubic-bezier(0.4,0,0.2,1)';
+        fillBar.setAttribute('width', barW);
+      }, 600 + i * 100);
+
+      // Gate marker
+      if(m.gate){
+        const marker = document.createElementNS('http://www.w3.org/2000/svg','text');
+        marker.setAttribute('x', xScale(m.end) + 6); marker.setAttribute('y', y + rowH/2 + 4);
+        marker.setAttribute('font-size','12'); marker.setAttribute('fill', m.color);
+        marker.textContent = '★'; svg.appendChild(marker);
+      }
+    });
+  }
+
+  // Draw on load and when schedule section enters view
+  const schedObs = new IntersectionObserver(entries=>{
+    if(entries[0].isIntersecting){ drawGantt(); schedObs.disconnect(); }
+  },{threshold:0.1});
+  const schedSec = document.getElementById('schedule');
+  if(schedSec) schedObs.observe(schedSec);
+  window.addEventListener('resize', drawGantt);
+})();
 </script>
-</body>
-</html>
+
+<!-- SECTION BOTTOM NAV -->
+<div id="section-nav">
+  <div class="snav-info">
+    <span class="snav-num" id="snav-num">07 / 07</span>
+    <span class="snav-title" id="snav-title">Future Phases</span>
+  </div>
+  <div class="snav-prog" id="snav-prog">
+    <div class="snav-dot" data-idx="0"></div>
+    <div class="snav-dot" data-idx="1"></div>
+    <div class="snav-dot" data-idx="2"></div>
+    <div class="snav-dot" data-idx="3"></div>
+    <div class="snav-dot" data-idx="4"></div>
+    <div class="snav-dot" data-idx="5"></div>
+    <div class="snav-dot active" data-idx="6"></div>
+  </div>
+  <div class="snav-btns">
+    <button class="snav-btn" id="snav-prev" onclick="snavGo(-1)">← Prev</button>
+    <button class="snav-btn primary" id="snav-next" onclick="snavGo(1)" disabled="">Next →</button>
+  </div>
+</div>
+
+<script>
+// SECTION BOTTOM NAVIGATOR
+(function(){
+  const SECTIONS = [
+    {id:'hero',      label:'Overview'},
+    {id:'exec',      label:'Why Aditi'},
+    {id:'scope',     label:'Approach'},
+    {id:'deliverables', label:'Deliverables'},
+    {id:'team',      label:'Team'},
+    {id:'schedule',  label:'Schedule'},
+    {id:'casestudy', label:'Case Study'},
+    {id:'phases',    label:'Future Phases'}
+  ];
+  let currentIdx = 0;
+
+  function getActiveSection(){
+    let idx = 0;
+    SECTIONS.forEach((s, i) => {
+      const el = document.getElementById(s.id);
+      if(el && window.scrollY >= el.offsetTop - 180) idx = i;
+    });
+    return idx;
+  }
+
+  function updateNav(idx){
+    currentIdx = Math.max(0, Math.min(idx, SECTIONS.length - 1));
+    document.getElementById('snav-num').textContent = String(currentIdx + 1).padStart(2,'0') + ' / ' + String(SECTIONS.length).padStart(2,'0');
+    document.getElementById('snav-title').textContent = SECTIONS[currentIdx].label;
+    document.getElementById('snav-prev').disabled = currentIdx === 0;
+    document.getElementById('snav-next').disabled = currentIdx === SECTIONS.length - 1;
+    document.querySelectorAll('.snav-dot').forEach((d, i) => d.classList.toggle('active', i === currentIdx));
+  }
+
+  window.snavGo = function(dir){
+    const target = currentIdx + dir;
+    if(target < 0 || target >= SECTIONS.length) return;
+    const el = document.getElementById(SECTIONS[target].id);
+    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    setTimeout(() => updateNav(target), 600);
+  };
+
+  // Also make dots clickable
+  document.querySelectorAll('.snav-dot').forEach(d => {
+    d.addEventListener('click', () => {
+      const i = parseInt(d.dataset.idx);
+      const el = document.getElementById(SECTIONS[i].id);
+      if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+      setTimeout(() => updateNav(i), 600);
+    });
+  });
+
+  // Sync on scroll
+  let scrollTick = false;
+  window.addEventListener('scroll', () => {
+    if(!scrollTick){
+      requestAnimationFrame(() => { updateNav(getActiveSection()); scrollTick = false; });
+      scrollTick = true;
+    }
+  }, {passive:true});
+
+  // Init
+  updateNav(0);
+})();
+</script>
+
+
+
+</body></html>
